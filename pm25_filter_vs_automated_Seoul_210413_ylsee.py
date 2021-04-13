@@ -59,5 +59,5 @@ for i in range(25):
     r2s.append(r_squared)
     names.append(data.columns[i+27][:-2])
 
-#pd.DataFrame(names).to_clipboard()
-#pd.DataFrame(r2s).to_clipboard()
+pd.DataFrame(names).to_clipboard()
+pd.DataFrame(r2s).to_clipboard()
