@@ -3,10 +3,16 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['font.size'] = 14
 
+from sklearn import linear_model
+import sklearn
+
+
 dir = 'D:/OneDrive - SNU/data/Sensors/signal process/'
 
-#signals = pd.read_csv(dir+'sensors_test1.csv') # for 1st test data
-signals = pd.read_csv(dir+'sensors_2nd_trial_SH.csv') # for 2nd test data
+signals = pd.read_csv(dir+'sensors_test1.csv') # for 1st test data
+#signals = pd.read_csv(dir+'sensors_2nd_trial_SH.csv') # for 2nd test data
+
+signals = signals.append(pd.read_csv(dir+'sensors_2nd_trial_SH.csv'))
 
 station = pd.read_csv(dir+'station.csv')
 
@@ -30,6 +36,7 @@ meteo = meteo[['date','temp','rh','wd','ws']]
 meteo['date'] = pd.to_datetime(meteo['date'], format="%y-%m-%d %H:%M", exact=False)
 meteo = meteo.groupby(pd.Grouper(freq='H', key='date')).mean()
 
+signals_hour = signals_hour.dropna(axis=0)
 
 data = pd.merge(signals_hour, station, how='inner', on='date')
 
@@ -123,19 +130,109 @@ plt.show()
 
 
 
+# for 1:1 plot
+
+x = data['co']
+y = data['sensor_CO']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
 
 plt.figure()
-plt.scatter(data['co'], data['sensor_CO'])
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., CO (ppm)')
+plt.ylabel('Sensor conc., CO (ppm)')
+plt.text(x.max() * 0.85, y.max() * 0.7, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 1.4, 0, 1.4])
+plt.grid(True, linestyle='--')
 plt.show()
 
-plt.figure()
-plt.scatter(data['no2'], data['sensor_NO2'])
-plt.show()
+
+
+
+x = data['no2']
+y = data['sensor_NO2']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
 
 plt.figure()
-plt.scatter(data['so2'], data['sensor_SO2'])
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., NO' + r'$_2$' + '(ppm)')
+plt.ylabel('Sensor conc., NO' + r'$_2$' + '(ppm)')
+plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 0.08, 0, 0.08])
+plt.grid(True, linestyle='--')
 plt.show()
 
+
+x = data['so2']
+y = data['sensor_SO2']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
+
 plt.figure()
-plt.scatter(data['o3'], data['sensor_O3'])
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., SO' + r'$_2$' + '(ppm)')
+plt.ylabel('Sensor conc., SO' + r'$_2$' + '(ppm)')
+plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 0.05, 0, 0.05])
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+x = data['o3']
+y = data['sensor_O3']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
+
+plt.figure()
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., O' + r'$_3$' + '(ppm)')
+plt.ylabel('Sensor conc., O' + r'$_3$' + '(ppm)')
+plt.text(x.max() * 0.75, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 0.10, 0, 0.10])
+plt.grid(True, linestyle='--')
 plt.show()
