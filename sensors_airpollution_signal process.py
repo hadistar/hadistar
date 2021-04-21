@@ -40,7 +40,7 @@ signals_hour = signals_hour.dropna(axis=0)
 
 data = pd.merge(signals_hour, station, how='inner', on='date')
 
-#data = pd.merge(data, meteo, how='inner', on='date')
+data = pd.merge(data, meteo, how='inner', on='date')
 
 del meteo, meteo1, meteo2, signals, station, signals_hour
 
@@ -130,7 +130,7 @@ plt.show()
 
 
 
-# for 1:1 plot
+# for 1:1 plot - all combined
 
 x = data['co']
 y = data['sensor_CO']
@@ -236,3 +236,130 @@ plt.text(x.max() * 0.75, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len
 plt.axis([0, 0.10, 0, 0.10])
 plt.grid(True, linestyle='--')
 plt.show()
+
+
+# box plot
+plt.figure()
+plt.boxplot(data['temp'])
+plt.xticks([])
+plt.grid(True, linestyle='--')
+plt.xlabel('Temperature (Degree)')
+plt.tight_layout()
+plt.text(1.1, data['temp'].mean(),
+         'Mean = {:.2f} \nMedian = {:.2f}'.format(
+             data['temp'].mean(), data['temp'].median()))
+plt.show()
+
+
+# box plot
+plt.figure()
+plt.boxplot(data['rh'])
+plt.xticks([])
+plt.grid(True, linestyle='--')
+plt.xlabel('Relative humidity (%)')
+plt.tight_layout()
+plt.text(1.1, data['rh'].median(),
+         'Mean = {:.2f} \nMedian = {:.2f}'.format(
+             data['rh'].mean(), data['rh'].median()))
+plt.show()
+
+
+
+
+# for 1:1 plot - Temp separation
+
+x = data['co']
+y = data['sensor_CO']
+
+
+plt.figure()
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., CO (ppm)')
+plt.ylabel('Sensor conc., CO (ppm)')
+plt.text(x.max() * 0.85, y.max() * 0.7, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 1.4, 0, 1.4])
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+
+
+x = data['no2']
+y = data['sensor_NO2']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
+
+plt.figure()
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., NO' + r'$_2$' + '(ppm)')
+plt.ylabel('Sensor conc., NO' + r'$_2$' + '(ppm)')
+plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 0.08, 0, 0.08])
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+x = data['so2']
+y = data['sensor_SO2']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
+
+plt.figure()
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., SO' + r'$_2$' + '(ppm)')
+plt.ylabel('Sensor conc., SO' + r'$_2$' + '(ppm)')
+plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 0.05, 0, 0.05])
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+x = data['o3']
+y = data['sensor_O3']
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
+
+plt.figure()
+plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., O' + r'$_3$' + '(ppm)')
+plt.ylabel('Sensor conc., O' + r'$_3$' + '(ppm)')
+plt.text(x.max() * 0.75, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.axis([0, 0.10, 0, 0.10])
+plt.grid(True, linestyle='--')
+plt.show()
+
