@@ -178,8 +178,8 @@ plt.figure()
 plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
 plt.plot(x, predicted_y, 'b-', 0.1)
 plt.plot([0,1.4],[0,1.4], 'k--')
-plt.xlabel('Station conc., NO' + r'$_2$' + '(ppm)')
-plt.ylabel('Sensor conc., NO' + r'$_2$' + '(ppm)')
+plt.xlabel('Station conc., NO' + r'$_2$' + ' (ppm)')
+plt.ylabel('Sensor conc., NO' + r'$_2$' + ' (ppm)')
 plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.08, 0, 0.08])
 plt.grid(True, linestyle='--')
@@ -204,8 +204,8 @@ plt.figure()
 plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
 plt.plot(x, predicted_y, 'b-', 0.1)
 plt.plot([0,1.4],[0,1.4], 'k--')
-plt.xlabel('Station conc., SO' + r'$_2$' + '(ppm)')
-plt.ylabel('Sensor conc., SO' + r'$_2$' + '(ppm)')
+plt.xlabel('Station conc., SO' + r'$_2$' + ' (ppm)')
+plt.ylabel('Sensor conc., SO' + r'$_2$' + ' (ppm)')
 plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.05, 0, 0.05])
 plt.grid(True, linestyle='--')
@@ -230,28 +230,29 @@ plt.figure()
 plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
 plt.plot(x, predicted_y, 'b-', 0.1)
 plt.plot([0,1.4],[0,1.4], 'k--')
-plt.xlabel('Station conc., O' + r'$_3$' + '(ppm)')
-plt.ylabel('Sensor conc., O' + r'$_3$' + '(ppm)')
+plt.xlabel('Station conc., O' + r'$_3$' + ' (ppm)')
+plt.ylabel('Sensor conc., O' + r'$_3$' + ' (ppm)')
 plt.text(x.max() * 0.75, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.10, 0, 0.10])
 plt.grid(True, linestyle='--')
 plt.show()
 
 
-# box plot
+# box  - temp
+
 plt.figure()
 plt.boxplot(data['temp'])
 plt.xticks([])
 plt.grid(True, linestyle='--')
-plt.xlabel('Temperature (Degree)')
+plt.xlabel(u'Temperature (\u00B0C)')
 plt.tight_layout()
 plt.text(1.1, data['temp'].mean(),
-         'Mean = {:.2f} \nMedian = {:.2f}'.format(
+         u'Mean = {:.2f} \u00B0C \nMedian = {:.2f} \u00B0C'.format(
              data['temp'].mean(), data['temp'].median()))
 plt.show()
 
 
-# box plot
+# box plot - RH
 plt.figure()
 plt.boxplot(data['rh'])
 plt.xticks([])
@@ -259,7 +260,7 @@ plt.grid(True, linestyle='--')
 plt.xlabel('Relative humidity (%)')
 plt.tight_layout()
 plt.text(1.1, data['rh'].median(),
-         'Mean = {:.2f} \nMedian = {:.2f}'.format(
+         'Mean = {:.2f} % \nMedian = {:.2f} %'.format(
              data['rh'].mean(), data['rh'].median()))
 plt.show()
 
@@ -268,98 +269,168 @@ plt.show()
 
 # for 1:1 plot - Temp separation
 
-x = data['co']
-y = data['sensor_CO']
+x_h = data.loc[data['temp'] > data['temp'].median()]['co']
+y_h = data.loc[data['temp'] > data['temp'].median()]['sensor_CO']
+
+x_l = data.loc[data['temp'] < data['temp'].median()]['co']
+y_l = data.loc[data['temp'] < data['temp'].median()]['sensor_CO']
 
 
 plt.figure()
-plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
-plt.plot(x, predicted_y, 'b-', 0.1)
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label=u'Temp > {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label=u'Temp < {:.1f} \u00B0C'.format(data['temp'].median()))
 plt.plot([0,1.4],[0,1.4], 'k--')
 plt.xlabel('Station conc., CO (ppm)')
 plt.ylabel('Sensor conc., CO (ppm)')
-plt.text(x.max() * 0.85, y.max() * 0.7, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 1.4, 0, 1.4])
 plt.grid(True, linestyle='--')
+plt.legend()
 plt.show()
 
 
 
+x_h = data.loc[data['temp'] > data['temp'].median()]['no2']
+y_h = data.loc[data['temp'] > data['temp'].median()]['sensor_NO2']
 
-x = data['no2']
-y = data['sensor_NO2']
-
-# Create linear regression object
-linreg = linear_model.LinearRegression()
-# Fit the linear regression model
-model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
-# Get the intercept and coefficients
-intercept = model.intercept_
-coef = model.coef_
-result = [intercept, coef]
-predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
-r_squared = sklearn.metrics.r2_score(y, predicted_y)
+x_l = data.loc[data['temp'] < data['temp'].median()]['no2']
+y_l = data.loc[data['temp'] < data['temp'].median()]['sensor_NO2']
 
 plt.figure()
-plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
-plt.plot(x, predicted_y, 'b-', 0.1)
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label=u'Temp > {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label=u'Temp < {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., NO' + r'$_2$' + ' (ppm)')
+plt.ylabel('Sensor conc., NO' + r'$_2$' + ' (ppm)')
+plt.axis([0, 0.1, 0, 0.1])
+plt.grid(True, linestyle='--')
+plt.legend()
+plt.show()
+
+
+x_h = data.loc[data['temp'] > data['temp'].median()]['so2']
+y_h = data.loc[data['temp'] > data['temp'].median()]['sensor_SO2']
+
+x_l = data.loc[data['temp'] < data['temp'].median()]['so2']
+y_l = data.loc[data['temp'] < data['temp'].median()]['sensor_SO2']
+
+plt.figure()
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label=u'Temp > {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label=u'Temp < {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., SO' + r'$_2$' + ' (ppm)')
+plt.ylabel('Sensor conc., SO' + r'$_2$' + ' (ppm)')
+plt.axis([0, 0.05, 0, 0.05])
+plt.grid(True, linestyle='--')
+plt.legend()
+plt.show()
+
+
+x_h = data.loc[data['temp'] > data['temp'].median()]['o3']
+y_h = data.loc[data['temp'] > data['temp'].median()]['sensor_O3']
+
+x_l = data.loc[data['temp'] < data['temp'].median()]['o3']
+y_l = data.loc[data['temp'] < data['temp'].median()]['sensor_O3']
+
+plt.figure()
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label=u'Temp > {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label=u'Temp < {:.1f} \u00B0C'.format(data['temp'].median()))
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., O' + r'$_3$' + ' (ppm)')
+plt.ylabel('Sensor conc., O' + r'$_3$' + ' (ppm)')
+plt.axis([0, 0.10, 0, 0.10])
+plt.grid(True, linestyle='--')
+plt.legend()
+plt.show()
+
+
+# for 1:1 plot - RH separation
+
+x_h = data.loc[data['rh'] > data['rh'].median()]['co']
+y_h = data.loc[data['rh'] > data['rh'].median()]['sensor_CO']
+
+x_l = data.loc[data['rh'] < data['rh'].median()]['co']
+y_l = data.loc[data['rh'] < data['rh'].median()]['sensor_CO']
+
+
+plt.figure()
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label='RH > {:.1f} %'.format(data['rh'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label='RH < {:.1f} %'.format(data['rh'].median()))
+plt.plot([0,1.4],[0,1.4], 'k--')
+plt.xlabel('Station conc., CO (ppm)')
+plt.ylabel('Sensor conc., CO (ppm)')
+plt.axis([0, 1.4, 0, 1.4])
+plt.grid(True, linestyle='--')
+plt.legend()
+plt.show()
+
+
+
+x_h = data.loc[data['rh'] > data['rh'].median()]['no2']
+y_h = data.loc[data['rh'] > data['rh'].median()]['sensor_NO2']
+
+x_l = data.loc[data['rh'] < data['rh'].median()]['no2']
+y_l = data.loc[data['rh'] < data['rh'].median()]['sensor_NO2']
+
+plt.figure()
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label='RH > {:.1f} %'.format(data['rh'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label='RH < {:.1f} %'.format(data['rh'].median()))
 plt.plot([0,1.4],[0,1.4], 'k--')
 plt.xlabel('Station conc., NO' + r'$_2$' + '(ppm)')
 plt.ylabel('Sensor conc., NO' + r'$_2$' + '(ppm)')
-plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.08, 0, 0.08])
 plt.grid(True, linestyle='--')
+plt.legend()
 plt.show()
 
 
-x = data['so2']
-y = data['sensor_SO2']
+x_h = data.loc[data['rh'] > data['rh'].median()]['so2']
+y_h = data.loc[data['rh'] > data['rh'].median()]['sensor_SO2']
 
-# Create linear regression object
-linreg = linear_model.LinearRegression()
-# Fit the linear regression model
-model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
-# Get the intercept and coefficients
-intercept = model.intercept_
-coef = model.coef_
-result = [intercept, coef]
-predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
-r_squared = sklearn.metrics.r2_score(y, predicted_y)
+x_l = data.loc[data['rh'] < data['rh'].median()]['so2']
+y_l = data.loc[data['rh'] < data['rh'].median()]['sensor_SO2']
 
 plt.figure()
-plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
-plt.plot(x, predicted_y, 'b-', 0.1)
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label='RH > {:.1f} %'.format(data['rh'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label='RH < {:.1f} %'.format(data['rh'].median()))
 plt.plot([0,1.4],[0,1.4], 'k--')
 plt.xlabel('Station conc., SO' + r'$_2$' + '(ppm)')
 plt.ylabel('Sensor conc., SO' + r'$_2$' + '(ppm)')
-plt.text(x.max() * 0.65, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.05, 0, 0.05])
 plt.grid(True, linestyle='--')
+plt.legend()
 plt.show()
 
 
-x = data['o3']
-y = data['sensor_O3']
+x_h = data.loc[data['rh'] > data['rh'].median()]['o3']
+y_h = data.loc[data['rh'] > data['rh'].median()]['sensor_O3']
 
-# Create linear regression object
-linreg = linear_model.LinearRegression()
-# Fit the linear regression model
-model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
-# Get the intercept and coefficients
-intercept = model.intercept_
-coef = model.coef_
-result = [intercept, coef]
-predicted_y = x.to_numpy().reshape(-1, 1) * coef + intercept
-r_squared = sklearn.metrics.r2_score(y, predicted_y)
+x_l = data.loc[data['rh'] < data['rh'].median()]['o3']
+y_l = data.loc[data['rh'] < data['rh'].median()]['sensor_O3']
 
 plt.figure()
-plt.scatter(x, y, s=80, facecolors='none', edgecolors='r')
-plt.plot(x, predicted_y, 'b-', 0.1)
+plt.scatter(x_h, y_h, s=40, facecolors='none', edgecolors='r',
+            label='RH > {:.1f} %'.format(data['rh'].median()))
+plt.scatter(x_l, y_l, s=40, facecolors='none', edgecolors='b',
+            label='RH < {:.1f} %'.format(data['rh'].median()))
 plt.plot([0,1.4],[0,1.4], 'k--')
 plt.xlabel('Station conc., O' + r'$_3$' + '(ppm)')
 plt.ylabel('Sensor conc., O' + r'$_3$' + '(ppm)')
-plt.text(x.max() * 0.75, y.max() * 0.5, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.10, 0, 0.10])
 plt.grid(True, linestyle='--')
+plt.legend()
 plt.show()
 
