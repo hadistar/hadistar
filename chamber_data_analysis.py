@@ -1,6 +1,8 @@
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 14
 
 dir = 'D:/OneDrive - SNU/data/Chamber test_first_210423'
 flow_dir = os.path.join(dir,'Flow/')
@@ -13,7 +15,12 @@ data_RH_T = pd.DataFrame()
 for i in rh_t_files:
     data_RH_T=data_RH_T.append(pd.read_csv(rh_t_dir+i))
 
+
 data_RH_T['Time'] = pd.to_datetime(data_RH_T['Time'])
+
+
+data_RH_T = data_RH_T.sort_values(by="Time")
+
 
 plt.figure()
 plt.plot(data_RH_T['Time'],data_RH_T['HumidityPV'],'ro', markersize=3, label='Humidity PV')
@@ -25,7 +32,65 @@ plt.ylabel('Temp or RH')
 plt.legend()
 plt.show()
 
+filtered_df =data_RH_T.loc[data_RH_T["Time"].
+    between('2021-04-23 16:20', '2021-04-23 17:45')]
 
+t_0 = filtered_df['Time'].iloc[0]
+elapsed_time = pd.to_timedelta(filtered_df['Time'] - t_0).astype('timedelta64[s]')/60
+
+plt.figure()
+plt.plot(elapsed_time,filtered_df['HumidityPV'],'ro-', markersize=3, label='Humidity')
+plt.plot(elapsed_time,filtered_df[' HumiditySV'],'b-', markersize=3, label='Humidity set value')
+#plt.plot(filtered_df['Time'],filtered_df[' Temperature'],'ko-', markersize=3, label='Temperature')
+plt.gcf().autofmt_xdate()
+plt.xlabel('Elapsed time (minutes)')
+plt.ylabel('Relative humidity (%)')
+plt.grid(True, linestyle='--')
+
+plt.xlim([0,80])
+plt.legend()
+plt.show()
+
+
+filtered_df =data_RH_T.loc[data_RH_T["Time"].
+    between('2021-04-23 14:20', '2021-04-23 16:00')]
+
+t_0 = filtered_df['Time'].iloc[0]
+elapsed_time = pd.to_timedelta(filtered_df['Time'] - t_0).astype('timedelta64[s]')/60
+
+plt.figure()
+plt.plot(elapsed_time,filtered_df['HumidityPV'],'ro-', markersize=3, label='Humidity')
+plt.plot(elapsed_time,filtered_df[' HumiditySV'],'b-', markersize=3, label='Humidity set value')
+#plt.plot(filtered_df['Time'],filtered_df[' Temperature'],'ko-', markersize=3, label='Temperature')
+plt.gcf().autofmt_xdate()
+plt.xlabel('Elapsed time (minutes)')
+plt.ylabel('Relative humidity (%)')
+plt.xlim([0,100])
+plt.legend()
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+filtered_df =data_RH_T.loc[data_RH_T["Time"].
+    between('2021-04-23 13:00', '2021-04-23 15:00')]
+
+t_0 = filtered_df['Time'].iloc[0]
+elapsed_time = pd.to_timedelta(filtered_df['Time'] - t_0).astype('timedelta64[s]')/60
+
+plt.figure()
+plt.plot(elapsed_time,filtered_df['HumidityPV'],'ro-', markersize=3, label='Humidity')
+plt.plot(elapsed_time,filtered_df[' HumiditySV'],'b-', markersize=3, label='Humidity set value')
+#plt.plot(filtered_df['Time'],filtered_df[' Temperature'],'ko-', markersize=3, label='Temperature')
+plt.gcf().autofmt_xdate()
+plt.xlabel('Elapsed time (minutes)')
+plt.ylabel('Relative humidity (%)')
+#plt.xlim([0,100])
+plt.legend()
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+'''
 data_Flow = pd.DataFrame()
 for i in flow_files:
     data_Flow=data_Flow.append(pd.read_csv(flow_dir+i))
@@ -42,3 +107,4 @@ plt.ylabel('Flow rate (mL/min)')
 plt.legend()
 plt.show()
 
+'''
