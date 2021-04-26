@@ -9,10 +9,10 @@ import sklearn
 
 dir = 'D:/OneDrive - SNU/data/Sensors/signal process/'
 
-#signals = pd.read_csv(dir+'sensors_test1.csv') # for 1st test data
-signals = pd.read_csv(dir+'sensors_2nd_trial_SH.csv') # for 2nd test data
+signals = pd.read_csv(dir+'sensors_test1.csv') # for 1st test data
+#signals = pd.read_csv(dir+'sensors_2nd_trial_SH.csv') # for 2nd test data
 
-#signals = signals.append(pd.read_csv(dir+'sensors_2nd_trial_SH.csv'))
+signals = signals.append(pd.read_csv(dir+'sensors_2nd_trial_SH.csv'))
 
 station = pd.read_csv(dir+'station.csv')
 
@@ -263,7 +263,7 @@ plt.plot(x, predicted_y, 'b-', 0.1)
 plt.plot([0,1.4],[0,1.4], 'k--')
 plt.xlabel('National station conc., O' + r'$_3$' + ' (ppm)')
 plt.ylabel('Sensor conc., O' + r'$_3$' + ' (ppm)')
-plt.text(x.max() * 1.1, y.max() * 0.65, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
+plt.text(x.max() * 0.9, y.max() * 0.6, '$R^2$ = %0.2f (n=%d)' % (r_squared, len(x)))
 plt.axis([0, 0.10, 0, 0.10])
 plt.grid(True, linestyle='--')
 plt.show()

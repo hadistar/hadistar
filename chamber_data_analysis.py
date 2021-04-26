@@ -76,8 +76,33 @@ plt.legend(loc='lower right')
 plt.show()
 
 
+
+
 filtered_df =data_RH_T.loc[data_RH_T["Time"].
-    between('2021-04-23 14:20', '2021-04-23 16:00')]
+    between('2021-04-24 19:30', '2021-04-24 21:30')]
+
+t_0 = filtered_df['Time'].iloc[0]
+elapsed_time = pd.to_timedelta(filtered_df['Time'] - t_0).astype('timedelta64[s]')/60
+
+plt.figure()
+plt.plot(elapsed_time,filtered_df['HumidityPV'],'ro-', markersize=3, label='Humidity')
+plt.plot(elapsed_time,filtered_df[' HumiditySV'],'b-', markersize=3, label='Humidity set value')
+#plt.plot(elapsed_time,filtered_df[' Temperature'],'ko-', markersize=3, label='Temperature')
+#plt.gcf().autofmt_xdate()
+plt.xlabel('Elapsed time (minutes)')
+plt.ylabel('Relative humidity (%)')
+plt.grid(True, linestyle='--')
+plt.ylim([0,50])
+#plt.xlim([0,84])
+plt.legend(loc='upper right')
+plt.show()
+
+
+
+
+
+filtered_df =data_RH_T.loc[data_RH_T["Time"].
+    between('2021-04-23 15:20', '2021-04-23 16:00')]
 
 t_0 = filtered_df['Time'].iloc[0]
 elapsed_time = pd.to_timedelta(filtered_df['Time'] - t_0).astype('timedelta64[s]')/60
@@ -99,7 +124,7 @@ plt.show()
 
 
 filtered_df =data_RH_T.loc[data_RH_T["Time"].
-    between('2021-04-23 12:00', '2021-04-23 15:00')]
+    between('2021-04-23 14:00', '2021-04-23 15:00')]
 
 t_0 = filtered_df['Time'].iloc[0]
 elapsed_time = pd.to_timedelta(filtered_df['Time'] - t_0).astype('timedelta64[s]')/60
