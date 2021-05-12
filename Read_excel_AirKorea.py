@@ -17,4 +17,4 @@ test = pd.merge(test, df[['측정소코드','주소']].drop_duplicates(),
 
 temp = test.loc[test['date'] == '2019-11-02']
 
-temp.to_csv('AirKorea_20191103.csv',index=False)
+temp.to_csv('AirKorea_20191103.csv',index=False, encoding='euc-kr')
