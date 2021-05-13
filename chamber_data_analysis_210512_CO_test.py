@@ -93,6 +93,35 @@ ax1.grid(True, linestyle='--')
 plt.show()
 
 
+
+plt.figure(figsize=(8,4.5))
+plt.plot(data_RH_T['Time'],data_RH_T[' Temperature'], 'ko-', label=u'Temperature (\u00B0C)')
+plt.xlabel('time (month-day hour)')
+plt.ylabel(u'Temperature (\u00B0C)', color='k')
+
+plt.tick_params(axis='x',labelrotation=45)
+plt.ylim(0, 40)
+
+plt.tight_layout()
+plt.legend(loc='upper right')
+plt.grid(True, linestyle='--')
+plt.show()
+
+plt.figure(figsize=(8,4.5))
+plt.plot(data_RH_T['Time'], data_RH_T['HumidityPV'], 'ko-', label='Relative humidity (%)')
+plt.xlabel('time (month-day hour)')
+plt.ylabel('Relative humidity (%)', color='k')
+plt.tick_params(axis='x',labelrotation=45)
+
+plt.ylim(30, 90)
+
+plt.tight_layout()
+plt.legend(loc='upper right')
+plt.grid(True, linestyle='--')
+plt.show()
+
+
+
 plt.figure()
 plt.plot(data_sensor['Time'], data_sensor[' NO2 CONC'], 'ro', label='Alphasense sensor')
 plt.plot(data_reference['Time'], data_reference['CO_ref'], 'bo', label='reference sensor')
