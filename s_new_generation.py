@@ -4,10 +4,10 @@ import numpy as np
 n_lat = 200
 n_lot = 200
 
-lat_start = 32.5
-lat_end = 38.5
-lon_start = 125
-lon_end = 130
+lat_start = 33.0
+lat_end = 38.6
+lon_start = 124.3
+lon_end = 129.9
 
 lat = np.linspace(lat_start,lat_end,n_lat)
 lon = np.linspace(lon_start,lon_end,n_lot)

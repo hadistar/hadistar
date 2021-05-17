@@ -4,10 +4,14 @@ import branca.colormap as cm
 from selenium import webdriver
 import time
 import math
+import matplotlib.pyplot as plt
+import cartopy
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 20
 
 df = pd.read_csv('Anew_source1.csv')
 
-
+# 1. Using Folium
 
 for i, day in enumerate(df.columns[2:]):
     m = folium.Map(location=[35.5502, 126.982],
@@ -24,8 +28,8 @@ for i, day in enumerate(df.columns[2:]):
                                  caption='concentration (ug/m3)')
 
     print(i, day)
-    for pt in range(int(len(df)/4)):
-        pt = pt *4
+    for pt in range(int(len(df))):
+        pt = pt
         color = colormap(df.iloc[pt][i+2])
         folium.CircleMarker(location = [df.iloc[pt][0],df.iloc[pt][1]],
                             radius=0.01,
@@ -45,3 +49,37 @@ for i, day in enumerate(df.columns[2:]):
     time.sleep(10)
     browser.save_screenshot('./test/test_'+str(day).replace('/','_')+'.png')
     browser.quit()
+
+# Using Pandas and Cartopy
+
+
+fig = plt.figure(figsize=(10,10))
+
+ax = plt.axes(projection=cartopy.crs.PlateCarree())
+
+ax.add_feature(cartopy.feature.LAND)
+ax.add_feature(cartopy.feature.OCEAN)
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle=':')
+ax.add_feature(cartopy.feature.LAKES, alpha=0.5)
+ax.add_feature(cartopy.feature.RIVERS)
+
+lon1, lon2, lat1, lat2 = 124, 130, 33, 39
+ax.set_extent([lon1, lon2, lat1, lat2], crs=cartopy.crs.PlateCarree())
+gl = ax.gridlines(draw_labels=True, crs=cartopy.crs.PlateCarree(), linestyle='--')
+gl.xlabel_style = {'size': 15}
+gl.ylabel_style = {'size': 15}
+
+import numpy as np
+lon = np.linspace(125,128,100)
+lat = np.linspace(35,38,100)
+data = np.linspace(10,20,100)
+
+points = plt.scatter(lon, lat, c=data, cmap='Reds', alpha=0.5)
+cb = plt.colorbar(points, orientation='vertical',ticklocation='auto', shrink=0.6, pad=0.1)
+cb.set_label(label='Concentration (ug/m3)', size=20)
+cb.ax.tick_params(labelsize=20)
+fig.tight_layout()
+
+
+plt.show()
