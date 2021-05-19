@@ -7,6 +7,8 @@ import math
 import matplotlib.pyplot as plt
 import cartopy
 import numpy as np
+import datetime
+
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['font.size'] = 20
 
@@ -54,7 +56,7 @@ for i, day in enumerate(df.columns[2:]):
     browser.save_screenshot('./test/test_'+str(day).replace('/','_')+'.png')
     browser.quit()
 
-# 2. Using Pandas and Cartopy
+# 2. Using Pandas and Cartopy_
 
 for i in range(len(df.columns)):
     day = date.iloc[i].date
@@ -92,5 +94,107 @@ for i in range(len(df.columns)):
     plt.tight_layout()
 
     plt.legend(title='['+day+']', loc='upper right')
-    plt.savefig('./test/test_'+str(day).replace('/','_')+'.jpg')
+    plt.savefig('./test2/test_'+str(day).replace('/','_')+'.jpg')
     plt.close()
+
+
+
+# 2. Using Pandas and Cartopy_ Same legend ver.
+
+for i in range(len(df.columns)):
+    day = date.iloc[i].date
+    day_ = datetime.datetime.strptime(day, '%m/%d/%Y')
+    print(i, day)
+
+    df_z = df.iloc[:,i]
+
+    plt.figure(figsize=(10,10))
+    ax = plt.axes(projection=cartopy.crs.PlateCarree())
+
+    ax.add_feature(cartopy.feature.LAND)
+    ax.add_feature(cartopy.feature.OCEAN, facecolor='lightblue')
+    ax.add_feature(cartopy.feature.COASTLINE, edgecolor='dimgray')
+    ax.add_feature(cartopy.feature.BORDERS, linestyle=':')
+    ax.add_feature(cartopy.feature.LAKES, alpha=0.5)
+    ax.add_feature(cartopy.feature.RIVERS)
+
+    lon1, lon2, lat1, lat2 = 123.5, 130.5, 32.5, 39.5
+    ax.set_extent([lon1, lon2, lat1, lat2], crs=cartopy.crs.PlateCarree())
+    gl = ax.gridlines(draw_labels=True, crs=cartopy.crs.PlateCarree(), linestyle='--')
+    gl.xlabel_style = {'size': 15}
+    gl.ylabel_style = {'size': 15}
+
+    #plt.plot(np.nan, np.nan, color=None, markersize=0, label='['+df.iloc[:,2].name+']')
+    plt.plot(s2['lon'], s2['lat'], color='blue', marker='X',
+             linestyle='None' , markersize=15, label='Monitoring Site')
+
+    # For annotation (city name)
+    for loc in range(len(s2)):
+        plt.annotate(s2['location'][loc], (s2['lon'][loc]-0.15, s2['lat'][loc]+0.15),
+                     fontsize=15, color='blue')
+
+#    points = plt.scatter
+
+#    [35.86588034847358, 128.5934264814463] # Daegu
+#    [37.346780, 126.740031] # Siheung
+
+    plt.plot([126.740031,128.5934264814463], [37.346780, 35.86588034847358], # Siheung, Daegu
+                color='black', marker='v',
+                linestyle='None', markersize=15, label='Unmonitored Site')
+    plt.annotate('Siheung', (126.740031 - 0.3, 37.346780 - 0.3),
+                 fontsize=15, color='black')
+    plt.annotate('Daegu', (128.593426 - 0.3, 35.86588 - 0.3),
+                 fontsize=15, color='black')
+
+
+    points = plt.scatter(s_new['lon'], s_new['lat'], c=df_z,
+                         vmin=0, vmax=40,
+                         cmap='Reds', alpha=0.8, s=3.0)
+    cb = plt.colorbar(points, orientation='horizontal',ticklocation='auto', shrink=0.5, pad=0.1)
+    cb.set_label(label='Concentration ('+ "${\mu}$" +'g/m' + r'$^3$' + ')', size=20)
+    cb.ax.tick_params(labelsize=20)
+    plt.tight_layout()
+
+    plt.legend(title='['+str(day_.date())+']', loc='upper right')
+    plt.savefig('./test2/test_'+str(day_.date())+'.jpg')
+    plt.close()
+
+
+
+
+
+
+# For AirKorea data
+
+AirKorea = pd.read_csv('AirKorea_20191103.csv', encoding='euc-kr')
+
+plt.figure(figsize=(10, 10))
+ax = plt.axes(projection=cartopy.crs.PlateCarree())
+
+ax.add_feature(cartopy.feature.LAND)
+ax.add_feature(cartopy.feature.OCEAN, facecolor='lightblue')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle=':')
+ax.add_feature(cartopy.feature.LAKES, alpha=0.5)
+ax.add_feature(cartopy.feature.RIVERS)
+
+lon1, lon2, lat1, lat2 = 123.5, 130.5, 32.5, 39.5
+ax.set_extent([lon1, lon2, lat1, lat2], crs=cartopy.crs.PlateCarree())
+gl = ax.gridlines(draw_labels=True, crs=cartopy.crs.PlateCarree(), linestyle='--')
+gl.xlabel_style = {'size': 15}
+gl.ylabel_style = {'size': 15}
+
+
+points = plt.scatter(AirKorea['Longitude'], AirKorea['Latitude'], c=AirKorea['PM25'],
+                     vmin=0, vmax=60,
+                     label='AirKorea stations',
+                     cmap='Reds', s=20.0)
+cb = plt.colorbar(points, orientation='horizontal', ticklocation='auto', shrink=0.5, pad=0.1)
+
+cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
+cb.ax.tick_params(labelsize=20)
+plt.tight_layout()
+
+plt.legend(title='[2019-11-03]', loc='upper right')
+plt.savefig('AirKorea_test_191103.jpg')
+plt.close()
