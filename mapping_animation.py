@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import cartopy
 import numpy as np
 import datetime
+from scalebar import scale_bar
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['font.size'] = 20
@@ -101,7 +102,7 @@ for i in range(len(df.columns)):
 
 # 2. Using Pandas and Cartopy_ Same legend ver.
 
-for i in range(len(df.columns)):
+for i in range(1400,1461): #range(len(df.columns)):
     day = date.iloc[i].date
     day_ = datetime.datetime.strptime(day, '%m/%d/%Y')
     print(i, day)
@@ -156,7 +157,10 @@ for i in range(len(df.columns)):
     plt.tight_layout()
 
     plt.legend(title='['+str(day_.date())+']', loc='upper right')
+    scale_bar(ax, (0.05, 0.05), 100)
+    #plt.show()
     plt.savefig('./test2/test_'+str(day_.date())+'.jpg')
+
     plt.close()
 
 
@@ -196,5 +200,8 @@ cb.ax.tick_params(labelsize=20)
 plt.tight_layout()
 
 plt.legend(title='[2019-11-03]', loc='upper right')
+scale_bar(ax, (0.05, 0.05), 100)
+
 plt.savefig('AirKorea_test_191103.jpg')
+
 plt.close()
