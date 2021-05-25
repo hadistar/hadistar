@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # CSV read
-X = pd.read_csv('Siheung_Conc.csv')
+X = pd.read_csv('Siheung_Unc.csv')
 
 target = X.iloc[:,1:]
 
@@ -13,5 +13,5 @@ Y= imputer.fit_transform(target)
 
 X.iloc[:,1:] = Y
 
-X.to_csv('Siheung_Conc_kNN_210519.csv')
+X.to_csv('Siheung_Conc_Unc_210519.csv', index=False)
 
