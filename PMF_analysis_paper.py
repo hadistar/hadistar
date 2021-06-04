@@ -11,7 +11,9 @@ import seaborn as sns
 
 # For Fig. 1. Comparison between cities
 
-## 1. AQI to mass concentration
+## - For data preprocessing
+
+### AQI to mass concentration
 
 Beijing = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\beijing-us embassy-air-quality.csv')
 Beijing['date'] = pd.to_datetime(Beijing['date'])
@@ -124,30 +126,6 @@ Seoul_daily = Seoul.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means
 Daebu_daily = Daebu.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
 Ulsan_daily = Ulsan.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
 
-# For daily plot
-
-plt.figure(figsize=(10,10))
-plt.plot(Beijing['date'], Beijing['pm25_conc'], label='Beijing, China')
-plt.plot(Shanghai['date'], Shanghai['pm25_conc'], label = 'Shanghai, China')
-plt.plot(Shenzhen['date'], Shenzhen['pm25_conc'], label = 'Shenzhen, China')
-plt.plot(Hamburg['date'], Hamburg['pm25_conc'], label='Hamburg, Germany')
-plt.plot(Siheung_daily.index, Siheung_daily['PM25'], label='Siheung, South Korea')
-plt.plot(Incheon_daily.index, Incheon_daily['PM25'], label='Incheon, South Korea')
-plt.plot(Yeosu_daily.index, Yeosu_daily['PM25'], label='Yeosu, South Korea')
-plt.plot(Seoul_daily.index, Seoul_daily['PM25'], label='Seoul, South Korea')
-plt.plot(Daebu_daily.index, Daebu_daily['PM25'], label='Daebu, South Korea')
-plt.plot(Ulsan_daily.index, Ulsan_daily['PM25'], label='Ulsan, South Korea')
-
-plt.xlim([datetime.date(2019, 1, 1), datetime.date(2019, 12, 31)])
-plt.xticks(rotation=45)
-plt.ylim([0,350])
-plt.tight_layout()
-plt.legend()
-plt.show()
-
-
-
-
 Beijing_monthly = Beijing.groupby(pd.Grouper(freq='M', key='date')).mean() # 'M' means monthly
 Shanghai_monthly = Shanghai.groupby(pd.Grouper(freq='M', key='date')).mean()
 Shenzhen_monthly = Shenzhen.groupby(pd.Grouper(freq='M', key='date')).mean()
@@ -160,28 +138,6 @@ Seoul_monthly = Seoul.groupby(pd.Grouper(freq='M', key='date')).mean()
 Daebu_monthly = Daebu.groupby(pd.Grouper(freq='M', key='date')).mean()
 Ulsan_monthly = Ulsan.groupby(pd.Grouper(freq='M', key='date')).mean()
 
-# For monthly plot
-
-plt.figure(figsize=(10,10))
-plt.plot(Beijing_monthly.index, Beijing_monthly['pm25_conc'], label='Beijing, China')
-plt.plot(Shanghai_monthly.index, Shanghai_monthly['pm25_conc'], label = 'Shanghai, China')
-plt.plot(Shenzhen_monthly.index, Shenzhen_monthly['pm25_conc'], label = 'Shenzhen, China')
-plt.plot(Hamburg_monthly.index, Hamburg_monthly['pm25_conc'], label='Hamburg, Germany')
-plt.plot(Siheung_monthly.index, Siheung_monthly['PM25'], label='Siheung, South Korea')
-plt.plot(Incheon_monthly.index, Incheon_monthly['PM25'], label='Incheon, South Korea')
-plt.plot(Yeosu_monthly.index, Yeosu_monthly['PM25'], label='Yeosu, South Korea')
-plt.plot(Seoul_monthly.index, Seoul_monthly['PM25'], label='Seoul, South Korea')
-plt.plot(Daebu_monthly.index, Daebu_monthly['PM25'], label='Daebu, South Korea')
-plt.plot(Ulsan_monthly.index, Ulsan_monthly['PM25'], label='Ulsan, South Korea')
-
-plt.xlim([datetime.date(2020, 1, 1), datetime.date(2020, 12, 31)])
-plt.xticks(rotation=45)
-plt.ylim([0,100])
-plt.tight_layout()
-plt.legend()
-plt.show()
-
-
 Beijing.to_csv('Beijing_daily.csv')
 Shanghai.to_csv('Shanghai_daily.csv')
 Shenzhen.to_csv('Shenzhen_daily.csv')
@@ -192,6 +148,137 @@ Yeosu_daily.to_csv('Yeosu_daily.csv', encoding='euc-kr')
 Seoul_daily.to_csv('Seoul_daily.csv', encoding='euc-kr')
 Daebu_daily.to_csv('Daebu_daily.csv', encoding='euc-kr')
 Ulsan_daily.to_csv('Ulsan_daily.csv', encoding='euc-kr')
+
+## End of data preprocessing
+
+## Data loading and plotting
+
+Beijing_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\1_Beijing_daily.csv')
+Shanghai_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\2_Shanghai_daily.csv')
+Shenzhen_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\3_Shenzhen_daily.csv')
+Hamburg_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\4_Hamburg_daily.csv')
+Siheung_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\5_Siheung_daily.csv', encoding='euc-kr')
+Incheon_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\6_Incheon_daily.csv', encoding='euc-kr')
+Yeosu_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\7_Yeosu_daily.csv', encoding='euc-kr')
+Seoul_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\8_Seoul_daily.csv', encoding='euc-kr')
+Daebu_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\9_Daebu_daily.csv', encoding='euc-kr')
+Ulsan_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\10_Ulsan_daily.csv', encoding='euc-kr')
+
+
+Beijing_daily['date'] = pd.to_datetime(Beijing_daily['date'])
+Shanghai_daily['date'] = pd.to_datetime(Shanghai_daily['date'])
+Shenzhen_daily['date'] = pd.to_datetime(Shenzhen_daily['date'])
+Hamburg_daily['date'] = pd.to_datetime(Hamburg_daily['date'])
+Siheung_daily['date'] = pd.to_datetime(Siheung_daily['date'])
+Incheon_daily['date'] = pd.to_datetime(Incheon_daily['date'])
+Yeosu_daily['date'] = pd.to_datetime(Yeosu_daily['date'])
+Seoul_daily['date'] = pd.to_datetime(Seoul_daily['date'])
+Daebu_daily['date'] = pd.to_datetime(Daebu_daily['date'])
+Ulsan_daily['date'] = pd.to_datetime(Ulsan_daily['date'])
+
+### For splitting
+
+df1_p1 = Beijing_daily.loc[(Beijing_daily['date'] > '2019-11-01') & (Beijing_daily['date'] < '2020-03-31')]
+df2_p1 = Shanghai_daily.loc[(Shanghai_daily['date'] > '2019-11-01') & (Shanghai_daily['date'] < '2020-03-31')]
+df3_p1 = Shenzhen_daily.loc[(Shenzhen_daily['date'] > '2019-11-01') & (Shenzhen_daily['date'] < '2020-03-31')]
+df4_p1 = Hamburg_daily.loc[(Hamburg_daily['date'] > '2019-11-01') & (Hamburg_daily['date'] < '2020-03-31')]
+df5_p1 = Siheung_daily.loc[(Siheung_daily['date'] > '2019-11-01') & (Siheung_daily['date'] < '2020-03-31')]
+df6_p1 = Incheon_daily.loc[(Incheon_daily['date'] > '2019-11-01') & (Incheon_daily['date'] < '2020-03-31')]
+df7_p1 = Yeosu_daily.loc[(Yeosu_daily['date'] > '2019-11-01') & (Yeosu_daily['date'] < '2020-03-31')]
+df8_p1 = Seoul_daily.loc[(Seoul_daily['date'] > '2019-11-01') & (Seoul_daily['date'] < '2020-03-31')]
+df9_p1 = Daebu_daily.loc[(Daebu_daily['date'] > '2019-11-01') & (Daebu_daily['date'] < '2020-03-31')]
+df10_p1 = Ulsan_daily.loc[(Ulsan_daily['date'] > '2019-11-01') & (Ulsan_daily['date'] < '2020-03-31')]
+
+
+boxdata = [list(df1_p1['pm25_conc'].dropna()),
+           list(df2_p1['pm25_conc'].dropna()),
+           list(df3_p1['pm25_conc'].dropna()),
+           list(df4_p1['pm25_conc'].dropna()),
+           list(df5_p1['PM25'].dropna()),
+           list(df6_p1['PM25'].dropna()),
+           list(df7_p1['PM25'].dropna()),
+           list(df8_p1['PM25'].dropna()),
+           list(df9_p1['PM25'].dropna()),
+           list(df10_p1['PM25'].dropna())]
+
+
+## For boxplot
+plt.figure(figsize=(8,8))
+#sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
+plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan'])
+plt.ylim([0,100])
+plt.xticks(rotation=45)
+plt.yticks(np.arange(0,110,10))
+plt.ylabel('Concentration ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
+plt.title("2019-11-01 to 2020-03-31")
+plt.grid(True, which='major', linestyle='--', linewidth=0.5)
+plt.tight_layout()
+plt.show()
+
+#### Data splitting from start to end
+
+start_date = '2018-11-01'
+end_date = '2019-03-31'
+
+df1_p2 = Beijing_daily.loc[(Beijing_daily['date'] > start_date) & (Beijing_daily['date'] < end_date)]
+df2_p2 = Shanghai_daily.loc[(Shanghai_daily['date'] > start_date) & (Shanghai_daily['date'] < end_date)]
+df3_p2 = Shenzhen_daily.loc[(Shenzhen_daily['date'] > start_date) & (Shenzhen_daily['date'] < end_date)]
+df4_p2 = Hamburg_daily.loc[(Hamburg_daily['date'] > start_date) & (Hamburg_daily['date'] < end_date)]
+df5_p2 = Siheung_daily.loc[(Siheung_daily['date'] > start_date) & (Siheung_daily['date'] < end_date)]
+df6_p2 = Incheon_daily.loc[(Incheon_daily['date'] > start_date) & (Incheon_daily['date'] < end_date)]
+df7_p2 = Yeosu_daily.loc[(Yeosu_daily['date'] > start_date) & (Yeosu_daily['date'] < end_date)]
+df8_p2 = Seoul_daily.loc[(Seoul_daily['date'] > start_date) & (Seoul_daily['date'] < end_date)]
+df9_p2 = Daebu_daily.loc[(Daebu_daily['date'] > start_date) & (Daebu_daily['date'] < end_date)]
+df10_p2 = Ulsan_daily.loc[(Ulsan_daily['date'] > start_date) & (Ulsan_daily['date'] < end_date)]
+
+
+boxdata = [list(df1_p2['pm25_conc'].dropna()),
+           list(df2_p2['pm25_conc'].dropna()),
+           list(df3_p2['pm25_conc'].dropna()),
+           list(df4_p2['pm25_conc'].dropna()),
+           list(df5_p2['PM25'].dropna()),
+           list(df6_p2['PM25'].dropna()),
+           list(df7_p2['PM25'].dropna()),
+           list(df8_p2['PM25'].dropna()),
+           list(df9_p2['PM25'].dropna()),
+           list(df10_p2['PM25'].dropna())]
+
+
+## For boxplot
+plt.figure(figsize=(8,8))
+#sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
+plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan'])
+plt.ylim([0,100])
+plt.xticks(rotation=45)
+plt.yticks(np.arange(0,110,10))
+plt.title(str(start_date) + " to " + str(end_date))
+plt.ylabel('Concentration ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
+plt.grid('--', linewidth=0.5)
+plt.tight_layout()
+plt.show()
+
+
+
+plt.figure(figsize=(10,10))
+plt.plot(Beijing_daily['date'], Beijing_daily['pm25_conc'], label='Beijing, China')
+plt.plot(Shanghai_daily['date'], Shanghai_daily['pm25_conc'], label = 'Shanghai, China')
+plt.plot(Shenzhen_daily['date'], Shenzhen_daily['pm25_conc'], label = 'Shenzhen, China')
+plt.plot(Hamburg_daily['date'], Hamburg_daily['pm25_conc'], label='Hamburg, Germany')
+plt.plot(Siheung_daily['date'], Siheung_daily['PM25'], label='Siheung, South Korea')
+plt.plot(Incheon_daily['date'], Incheon_daily['PM25'], label='Incheon, South Korea')
+plt.plot(Yeosu_daily['date'], Yeosu_daily['PM25'], label='Yeosu, South Korea')
+plt.plot(Seoul_daily['date'], Seoul_daily['PM25'], label='Seoul, South Korea')
+plt.plot(Daebu_daily['date'], Daebu_daily['PM25'], label='Daebu, South Korea')
+plt.plot(Ulsan_daily['date'], Ulsan_daily['PM25'], label='Ulsan, South Korea')
+
+plt.xlim([datetime.date(2019, 1, 1), datetime.date(2019, 12, 31)])
+plt.xticks(rotation=45)
+plt.ylim([0,350])
+plt.tight_layout()
+plt.legend()
+plt.show()
+
+
 
 
 boxdata = [list(Beijing['pm25_conc'].dropna()),
@@ -248,3 +335,28 @@ data = pd.merge(df,meteo_daily, how='left', on='date')
 data = data.drop(['지점', '현지기압(hPa)', '해면기압(hPa)', '일사(MJ/m^2)', '일조(hr)', 'wind_x', 'wind_y'], axis=1) # Column drop
 
 data.to_csv('SH_PMF_meteo.csv', index=False, encoding='euc-kr')
+
+
+# For hourly data generation
+df = pd.read_csv('D:\Data_backup\Dropbox\PMF_paper\data_YSLEE\PMF results_raw_YSLEE.csv')
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+
+meteo = meteo3.append(meteo4)
+meteo = meteo.rename(columns = {"일시":'date'})
+meteo['date'] = pd.to_datetime(meteo['date'])
+
+data = pd.DataFrame()
+
+for n in range(len(df)):
+    print(n)
+    for i in range(24):
+        temp = df.iloc[n].copy()
+        temp['date'] = temp['date'] + pd.to_timedelta(i, unit='h')
+        data = data.append(temp, sort=False)
+
+data = data[df.columns] # Ordering
+data['date'] = pd.to_datetime(data['date'])
+
+data = pd.merge(data, meteo, how='left', on='date')
+
+data.to_csv('SH_PMF_meteo_hourly.csv', index=False, encoding='euc-kr')
