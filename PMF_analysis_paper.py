@@ -360,6 +360,3 @@ data['date'] = pd.to_datetime(data['date'])
 data = pd.merge(data, meteo, how='left', on='date')
 
 data.to_csv('SH_PMF_meteo_hourly.csv', index=False, encoding='euc-kr')
-
-
-df.to_csv('PMF results_raw_YSLEE.csv', index=False, encoding='utf8')

@@ -19,7 +19,6 @@ head(df)
 
 # For hourly wind data -> data
 
-setwd('D:\\OneDrive - SNU\\R\\Openair_20_1103')
 data<- read.csv("D:\\Data_backup\\Dropbox\\PMF_paper\\SH_PMF_meteo_hourly.csv", header = TRUE) 
 
 
