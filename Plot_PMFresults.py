@@ -3,16 +3,16 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 import math
 
-df = pd.read_csv('210607recal_ConstrainedErrorEstimationSummary_v5.csv')
-df_contri = pd.read_csv('210607recal_ConstrainedErrorEstimationSummary_v5_contribution.csv').dropna()
+df = pd.read_csv('210607recal_ConstrainedErrorEstimationSummary_v8.csv')
+df_contri = pd.read_csv('210607recal_ConstrainedErrorEstimationSummary_v8_contribution.csv').dropna()
 df_contri['date'] = pd.to_datetime(df_contri['date'], format='%m-%d-%y %H:%M')
 
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['font.size'] = 13
 
-Sources_name = ['Sea salts','Soil', 'Combustion for heating',
-                'Coal combustion','Secondary sulfate','Industry (smelting)',
-                'Secondary Nitrate','Mobile','Biomass burning','Industry (oil)']
+Sources_name = ['Sea salts','Soil', 'Secondary sulfate',
+                'Coal combustion','Biomass burning','Industry (smelting)','Industry (oil)',
+                'Combustion for heating', 'Secondary Nitrate','Mobile']
 
 data = pd.DataFrame()
 data['Species'] = df['Species']
@@ -91,6 +91,26 @@ fig.text(0.05, 0.5, 'Mass Concentration ('+ "${\mu}$" +'g/m'+"$^3$"+")",
 fig.autofmt_xdate(rotation=45)
 plt.show()
 
+
+# Making X matrix
+
+import numpy as np
+
+G = np.array(df_contri.iloc[:,1:]) # 90 by 10
+P = np.array(pd.read_csv('210607recal_Constrained_v8_P3.csv', header=None).T/100) # 10 by 22 (excluding PM2.5)
+X = G @ P
+X[X<0] = 0
+pd.DataFrame(X).to_clipboard(index=False, header=None)
+
+## 1:1 plot
+plt.figure()
+plt.plot(G.sum(axis=1), X.sum(axis=1), 'bo')
+plt.show()
+
+i = 9 # i is source number
+X_source = G[:,i].reshape(-1,1) * P[i,:]
+X_source[X_source<0] = 0
+pd.DataFrame(X_source).to_clipboard(index=False, header=None)
 
 
 #

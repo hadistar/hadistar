@@ -15,22 +15,30 @@ import seaborn as sns
 
 ### AQI to mass concentration
 
-Beijing = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\beijing-us embassy-air-quality.csv')
+Beijing = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\beijing-us embassy-air-quality.csv')
 Beijing['date'] = pd.to_datetime(Beijing['date'])
 Beijing[' pm25'] = pd.to_numeric(Beijing[' pm25'], errors='coerce')
 
 
-Hamburg = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\Hamburg, germany-air-quality.csv')
+Hamburg = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\Hamburg, germany-air-quality.csv')
 Hamburg['date'] = pd.to_datetime(Hamburg['date'])
 Hamburg[' pm25'] = pd.to_numeric(Hamburg[' pm25'], errors='coerce')
 
-Shanghai = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\shanghai-air-quality.csv')
+Shanghai = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\shanghai-air-quality.csv')
 Shanghai['date'] = pd.to_datetime(Shanghai['date'])
 Shanghai[' pm25'] = pd.to_numeric(Shanghai[' pm25'], errors='coerce')
 
-Shenzhen = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\shenzhen-air-quality.csv')
+Shenzhen = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\shenzhen-air-quality.csv')
 Shenzhen['date'] = pd.to_datetime(Shenzhen['date'])
 Shenzhen[' pm25'] = pd.to_numeric(Shenzhen[' pm25'], errors='coerce')
+
+Kassel1 = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\kassel-fünffensterstr.,-germany-air-quality.csv')
+Kassel1['date'] = pd.to_datetime(Kassel1['date'])
+Kassel1[' pm25'] = pd.to_numeric(Kassel1[' pm25'], errors='coerce')
+
+Kassel2 = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\kassel-mitte,-germany-air-quality.csv')
+Kassel2['date'] = pd.to_datetime(Kassel2['date'])
+Kassel2[' pm25'] = pd.to_numeric(Kassel2[' pm25'], errors='coerce')
 
 # AQI and PM2.5 conversion, US EPA calculation method
 
@@ -68,6 +76,14 @@ Shanghai['pm25_conc'] = Shanghai.apply(to_con, axis=1)
 Shanghai = Shanghai.sort_values(by='date')
 Shenzhen['pm25_conc'] = Shenzhen.apply(to_con, axis=1)
 Shenzhen = Shenzhen.sort_values(by='date')
+Kassel1['pm25_conc'] = Kassel1.apply(to_con, axis=1)
+Kassel1 = Kassel1.sort_values(by='date')
+
+Kassel2['pm25_conc'] = Kassel2.apply(to_con, axis=1)
+Kassel2 = Kassel2.sort_values(by='date')
+
+
+
 
 AirKorea_2018_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2018')
 AirKorea_2019_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2019')
@@ -112,12 +128,42 @@ for i in range(len(AirKorea_2020_list)):
     Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)
 
 
-Siheung['date'] = pd.to_datetime(Siheung['측정일시'], format='%Y%m%d%H', errors='coerce')
-Incheon['date'] = pd.to_datetime(Incheon['측정일시'], format='%Y%m%d%H', errors='coerce')
-Yeosu['date'] = pd.to_datetime(Yeosu['측정일시'], format='%Y%m%d%H', errors='coerce')
-Seoul['date'] = pd.to_datetime(Seoul['측정일시'], format='%Y%m%d%H', errors='coerce')
-Daebu['date'] = pd.to_datetime(Daebu['측정일시'], format='%Y%m%d%H', errors='coerce')
-Ulsan['date'] = pd.to_datetime(Ulsan['측정일시'], format='%Y%m%d%H', errors='coerce')
+#Siheung['date'] = pd.to_datetime(Siheung['측정일시'], format='%Y%m%d%H', errors='coerce')
+
+# improved version
+Siheung['temp'] = Siheung['측정일시'] - 1
+Siheung['date'] = pd.to_datetime(Siheung['temp'], format='%Y%m%d%H')
+Siheung['date'] = Siheung['date'] + pd.DateOffset(hours=1)
+
+#Incheon['date'] = pd.to_datetime(Incheon['측정일시'], format='%Y%m%d%H', errors='coerce')
+
+Incheon['temp'] = Incheon['측정일시'] - 1
+Incheon['date'] = pd.to_datetime(Incheon['temp'], format='%Y%m%d%H')
+Incheon['date'] = Incheon['date'] + pd.DateOffset(hours=1)
+
+#Yeosu['date'] = pd.to_datetime(Yeosu['측정일시'], format='%Y%m%d%H', errors='coerce')
+
+Yeosu['temp'] = Yeosu['측정일시'] - 1
+Yeosu['date'] = pd.to_datetime(Yeosu['temp'], format='%Y%m%d%H')
+Yeosu['date'] = Yeosu['date'] + pd.DateOffset(hours=1)
+
+Seoul['temp'] = Seoul['측정일시'] - 1
+Seoul['date'] = pd.to_datetime(Seoul['temp'], format='%Y%m%d%H')
+Seoul['date'] = Seoul['date'] + pd.DateOffset(hours=1)
+
+#Seoul['date'] = pd.to_datetime(Seoul['측정일시'], format='%Y%m%d%H', errors='coerce')
+
+Daebu['temp'] = Daebu['측정일시'] - 1
+Daebu['date'] = pd.to_datetime(Daebu['temp'], format='%Y%m%d%H')
+Daebu['date'] = Daebu['date'] + pd.DateOffset(hours=1)
+
+#Daebu['date'] = pd.to_datetime(Daebu['측정일시'], format='%Y%m%d%H', errors='coerce')
+
+Ulsan['temp'] = Ulsan['측정일시'] - 1
+Ulsan['date'] = pd.to_datetime(Ulsan['temp'], format='%Y%m%d%H')
+Ulsan['date'] = Ulsan['date'] + pd.DateOffset(hours=1)
+
+#Ulsan['date'] = pd.to_datetime(Ulsan['측정일시'], format='%Y%m%d%H', errors='coerce')
 
 Siheung_daily = Siheung.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
 Incheon_daily = Incheon.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
@@ -130,6 +176,8 @@ Beijing_monthly = Beijing.groupby(pd.Grouper(freq='M', key='date')).mean() # 'M'
 Shanghai_monthly = Shanghai.groupby(pd.Grouper(freq='M', key='date')).mean()
 Shenzhen_monthly = Shenzhen.groupby(pd.Grouper(freq='M', key='date')).mean()
 Hamburg_monthly = Hamburg.groupby(pd.Grouper(freq='M', key='date')).mean()
+Kassel1_monthly = Kassel1.groupby(pd.Grouper(freq='M', key='date')).mean()
+Kassel2_monthly = Kassel2.groupby(pd.Grouper(freq='M', key='date')).mean()
 
 Siheung_monthly = Siheung.groupby(pd.Grouper(freq='M', key='date')).mean()
 Incheon_monthly = Incheon.groupby(pd.Grouper(freq='M', key='date')).mean()
@@ -138,37 +186,62 @@ Seoul_monthly = Seoul.groupby(pd.Grouper(freq='M', key='date')).mean()
 Daebu_monthly = Daebu.groupby(pd.Grouper(freq='M', key='date')).mean()
 Ulsan_monthly = Ulsan.groupby(pd.Grouper(freq='M', key='date')).mean()
 
-Beijing.to_csv('Beijing_daily.csv')
-Shanghai.to_csv('Shanghai_daily.csv')
-Shenzhen.to_csv('Shenzhen_daily.csv')
-Hamburg.to_csv('Hamburg_daily.csv')
-Siheung_daily.to_csv('Siheung_daily.csv', encoding='euc-kr')
-Incheon_daily.to_csv('Incheon_daily.csv', encoding='euc-kr')
-Yeosu_daily.to_csv('Yeosu_daily.csv', encoding='euc-kr')
-Seoul_daily.to_csv('Seoul_daily.csv', encoding='euc-kr')
-Daebu_daily.to_csv('Daebu_daily.csv', encoding='euc-kr')
-Ulsan_daily.to_csv('Ulsan_daily.csv', encoding='euc-kr')
+Beijing.to_csv('1_Beijing_daily.csv')
+Shanghai.to_csv('2_Shanghai_daily.csv')
+Shenzhen.to_csv('3_Shenzhen_daily.csv')
+Hamburg.to_csv('4_Hamburg_daily.csv')
+Kassel1.to_csv('11_Kassel1_daily.csv')
+Kassel2.to_csv('12_Kassel2_daily.csv')
+
+
+Siheung_daily.to_csv('5_Siheung_daily.csv', encoding='euc-kr')
+Incheon_daily.to_csv('6_Incheon_daily.csv', encoding='euc-kr')
+Yeosu_daily.to_csv('7_Yeosu_daily.csv', encoding='euc-kr')
+Seoul_daily.to_csv('8_Seoul_daily.csv', encoding='euc-kr')
+Daebu_daily.to_csv('9_Daebu_daily.csv', encoding='euc-kr')
+Ulsan_daily.to_csv('10_Ulsan_daily.csv', encoding='euc-kr')
 
 ## End of data preprocessing
 
+
 ## Data loading and plotting
 
-Beijing_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\1_Beijing_daily.csv')
-Shanghai_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\2_Shanghai_daily.csv')
-Shenzhen_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\3_Shenzhen_daily.csv')
-Hamburg_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\4_Hamburg_daily.csv')
-Siheung_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\5_Siheung_daily.csv', encoding='euc-kr')
-Incheon_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\6_Incheon_daily.csv', encoding='euc-kr')
-Yeosu_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\7_Yeosu_daily.csv', encoding='euc-kr')
-Seoul_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\8_Seoul_daily.csv', encoding='euc-kr')
-Daebu_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\9_Daebu_daily.csv', encoding='euc-kr')
-Ulsan_daily = pd.read_csv('D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\10_Ulsan_daily.csv', encoding='euc-kr')
+Beijing_daily = pd.read_csv('1_Beijing_daily.csv')
+Shanghai_daily = pd.read_csv('2_Shanghai_daily.csv')
+Shenzhen_daily = pd.read_csv('3_Shenzhen_daily.csv')
+Hamburg_daily = pd.read_csv('4_Hamburg_daily.csv')
+Kassel1_daily = pd.read_csv('11_Kassel1_daily.csv')
+Kassel2_daily = pd.read_csv('12_Kassel2_daily.csv')
+
+Siheung_daily = pd.read_csv('5_Siheung_daily.csv', encoding='euc-kr')
+Incheon_daily = pd.read_csv('6_Incheon_daily.csv', encoding='euc-kr')
+Yeosu_daily = pd.read_csv('7_Yeosu_daily.csv', encoding='euc-kr')
+Seoul_daily = pd.read_csv('8_Seoul_daily.csv', encoding='euc-kr')
+Daebu_daily = pd.read_csv('9_Daebu_daily.csv', encoding='euc-kr')
+Ulsan_daily = pd.read_csv('10_Ulsan_daily.csv', encoding='euc-kr')
+
+
+# Beijing_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\1_Beijing_daily.csv')
+# Shanghai_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\3_Shenzhen_daily.csv')
+# Hamburg_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\4_Hamburg_daily.csv')
+# Kassel1_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\11_Kassel1_daily.csv')
+# Kassel2_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\12_Kassel2_daily.csv')
+#
+# Siheung_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\5_Siheung_daily.csv', encoding='euc-kr')
+# Incheon_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\6_Incheon_daily.csv', encoding='euc-kr')
+# Yeosu_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\7_Yeosu_daily.csv', encoding='euc-kr')
+# Seoul_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\8_Seoul_daily.csv', encoding='euc-kr')
+# Daebu_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\9_Daebu_daily.csv', encoding='euc-kr')
+# Ulsan_daily = pd.read_csv('D:\\Dropbox\\PMF_paper\\data_YSLEE\\10_Ulsan_daily.csv', encoding='euc-kr')
 
 
 Beijing_daily['date'] = pd.to_datetime(Beijing_daily['date'])
 Shanghai_daily['date'] = pd.to_datetime(Shanghai_daily['date'])
 Shenzhen_daily['date'] = pd.to_datetime(Shenzhen_daily['date'])
 Hamburg_daily['date'] = pd.to_datetime(Hamburg_daily['date'])
+Kassel1_daily['date'] = pd.to_datetime(Kassel1_daily['date'])
+Kassel2_daily['date'] = pd.to_datetime(Kassel2_daily['date'])
+
 Siheung_daily['date'] = pd.to_datetime(Siheung_daily['date'])
 Incheon_daily['date'] = pd.to_datetime(Incheon_daily['date'])
 Yeosu_daily['date'] = pd.to_datetime(Yeosu_daily['date'])
@@ -188,7 +261,8 @@ df7_p1 = Yeosu_daily.loc[(Yeosu_daily['date'] > '2019-11-01') & (Yeosu_daily['da
 df8_p1 = Seoul_daily.loc[(Seoul_daily['date'] > '2019-11-01') & (Seoul_daily['date'] < '2020-03-31')]
 df9_p1 = Daebu_daily.loc[(Daebu_daily['date'] > '2019-11-01') & (Daebu_daily['date'] < '2020-03-31')]
 df10_p1 = Ulsan_daily.loc[(Ulsan_daily['date'] > '2019-11-01') & (Ulsan_daily['date'] < '2020-03-31')]
-
+df11_p1 = Kassel1_daily.loc[(Kassel1_daily['date']  > '2019-11-01') & (Kassel1_daily['date'] < '2020-03-31')]
+df12_p1 = Kassel2_daily.loc[(Kassel2_daily['date']  > '2019-11-01') & (Kassel2_daily['date'] < '2020-03-31')]
 
 boxdata = [list(df1_p1['pm25_conc'].dropna()),
            list(df2_p1['pm25_conc'].dropna()),
@@ -199,13 +273,15 @@ boxdata = [list(df1_p1['pm25_conc'].dropna()),
            list(df7_p1['PM25'].dropna()),
            list(df8_p1['PM25'].dropna()),
            list(df9_p1['PM25'].dropna()),
-           list(df10_p1['PM25'].dropna())]
-
+           list(df10_p1['PM25'].dropna()),
+           list(df11_p1['pm25_conc'].dropna()),
+           list(df12_p1['pm25_conc'].dropna())]
 
 ## For boxplot
 plt.figure(figsize=(8,8))
 #sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
-plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan'])
+plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg',
+                             'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan', 'Kassel1','Kassel2'])
 plt.ylim([0,100])
 plt.xticks(rotation=45)
 plt.yticks(np.arange(0,110,10))
@@ -217,8 +293,8 @@ plt.show()
 
 #### Data splitting from start to end
 
-start_date = '2018-11-01'
-end_date = '2019-03-31'
+start_date = '2019-11-01'
+end_date = '2020-03-31'
 
 df1_p2 = Beijing_daily.loc[(Beijing_daily['date'] > start_date) & (Beijing_daily['date'] < end_date)]
 df2_p2 = Shanghai_daily.loc[(Shanghai_daily['date'] > start_date) & (Shanghai_daily['date'] < end_date)]
@@ -230,6 +306,8 @@ df7_p2 = Yeosu_daily.loc[(Yeosu_daily['date'] > start_date) & (Yeosu_daily['date
 df8_p2 = Seoul_daily.loc[(Seoul_daily['date'] > start_date) & (Seoul_daily['date'] < end_date)]
 df9_p2 = Daebu_daily.loc[(Daebu_daily['date'] > start_date) & (Daebu_daily['date'] < end_date)]
 df10_p2 = Ulsan_daily.loc[(Ulsan_daily['date'] > start_date) & (Ulsan_daily['date'] < end_date)]
+df11_p2 = Kassel1_daily.loc[(Kassel1_daily['date']  > start_date) & (Kassel1_daily['date'] < end_date)]
+df12_p2 = Kassel2_daily.loc[(Kassel2_daily['date']  > start_date) & (Kassel2_daily['date'] < end_date)]
 
 
 boxdata = [list(df1_p2['pm25_conc'].dropna()),
@@ -241,13 +319,21 @@ boxdata = [list(df1_p2['pm25_conc'].dropna()),
            list(df7_p2['PM25'].dropna()),
            list(df8_p2['PM25'].dropna()),
            list(df9_p2['PM25'].dropna()),
-           list(df10_p2['PM25'].dropna())]
+           list(df10_p2['PM25'].dropna()),
+           list(df11_p2['pm25_conc'].dropna())]
+
+### Reordring
+
+names = ['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung',
+         'Incheon','Yeosu','Seoul','Daebu','Ulsan', 'Kassel']
+order = [0,1,3,10,4,9,6,5,7,8]
+boxdata = [boxdata[i] for i in order]
 
 
 ## For boxplot
 plt.figure(figsize=(8,8))
 #sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
-plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan'])
+plt.boxplot(boxdata, labels=[names[i] for i in order])
 plt.ylim([0,100])
 plt.xticks(rotation=45)
 plt.yticks(np.arange(0,110,10))
@@ -258,6 +344,7 @@ plt.tight_layout()
 plt.show()
 
 
+## For time-series plot
 
 plt.figure(figsize=(10,10))
 plt.plot(Beijing_daily['date'], Beijing_daily['pm25_conc'], label='Beijing, China')
@@ -338,7 +425,7 @@ data.to_csv('SH_PMF_meteo.csv', index=False, encoding='euc-kr')
 
 
 # For hourly data generation
-df = pd.read_csv('D:\Data_backup\Dropbox\PMF_paper\data_YSLEE\PMF results_raw_YSLEE.csv')
+df = pd.read_csv('D:\Dropbox\PMF_paper\SH_PMF_meteo_daily_v8.csv')
 df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
 
 meteo = meteo3.append(meteo4)
@@ -360,3 +447,18 @@ data['date'] = pd.to_datetime(data['date'])
 data = pd.merge(data, meteo, how='left', on='date')
 
 data.to_csv('SH_PMF_meteo_hourly.csv', index=False, encoding='euc-kr')
+
+
+
+# 2021-06-10, recal
+
+df = pd.read_csv('D:\Dropbox\PMF_paper\PMF results_raw\PMF results_YSLEE.csv')
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+
+data = pd.merge(data, Siheung, how='left', on='date')
+
+data.to_csv('SH_PMF_meteo_hourly.csv', index=False, encoding='euc-kr')
+
+
+Siheung_daily = Siheung.groupby(pd.Grouper(freq='D', key='date')).mean()
+
