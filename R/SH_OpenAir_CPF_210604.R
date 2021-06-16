@@ -3,8 +3,8 @@ library(openair)
 
 # For minutes wind data -> df
 
-data<- read.csv("D:\\Data_backup\\Dropbox\\PMF_paper\\data_YSLEE\\PMF results_raw_YSLEE.csv", header = TRUE) 
-winddata<- read.csv("D:\\OneDrive - SNU\\R\\Openair_20_1103\\wind_1486.csv", header = TRUE)
+data<- read.csv("D:\\Dropbox\\PMF_paper\\SH_PMF_meteo_hourly_v8.csv", header = TRUE) 
+#winddata<- read.csv("D:\\OneDrive - SNU\\R\\Openair_20_1103\\wind_1486.csv", header = TRUE)
 
 data$date <- as.POSIXct(strptime(data$date, format = "%Y-%m-%d", tz = "GMT"))
 
@@ -19,7 +19,7 @@ head(df)
 
 # For hourly wind data -> data
 
-data<- read.csv("D:\\Data_backup\\Dropbox\\PMF_paper\\SH_PMF_meteo_hourly.csv", header = TRUE) 
+data<- read.csv("D:\\Dropbox\\PMF_paper\\SH_PMF_meteo_hourly_v8.csv", header = TRUE) 
 
 
 data$date <- as.POSIXct(strptime(data$date, format = "%Y-%m-%d %H:%M", tz = "GMT"))
@@ -32,11 +32,41 @@ data$date <- as.POSIXct(strptime(data$date, format = "%Y-%m-%d %H:%M", tz = "GMT
 
 df_haze = df[(df$PM25_observed>35.0), ]
 
+data_haze = data[(data$PM25_observed>=35.0), ]
+data_nonhaze = data[(data$PM25_observed<35.0), ]
+
 
 # Drawing
 
-polarPlot(df_haze, pollutant = "Industry.smelting", col = "jet", key.position = "bottom",
-          key.header = "mean PM25(ug/m3)", key.footer = NULL)
+for(i in colnames(data)){
+
+  if (i != 'date' & i != 'wd' & i != 'ws'){
+    print(i)
+    jpeg(paste(i,'.jpeg'))
+    polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
+              key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i)
+    dev.off()
+    }
+}
+
+
+
+for(i in colnames(data)){
+  
+  if (i != 'date' & i != 'wd' & i != 'ws'){
+    print(i)
+    jpeg(paste(i,'.jpeg'))
+    polarPlot(data_nonhaze, pollutant = i, col = "jet", key.position = "bottom",
+              key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i)
+    dev.off()
+  }
+}
+
+polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
+          key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i)
+
+polarPlot(data, pollutant = "PM25_observed", col = "jet", key.position = "bottom",
+          key.header = "mean PM25(ug/m3)", key.footer = NULL, main = 'A')
 
 polarPlot(df_haze, pollutant = "Industry.Oil.", col = "jet", key.position = "bottom",
           key.header = "mean PM25(ug/m3)", key.footer = NULL)
