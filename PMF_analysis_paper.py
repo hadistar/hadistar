@@ -249,52 +249,10 @@ Seoul_daily['date'] = pd.to_datetime(Seoul_daily['date'])
 Daebu_daily['date'] = pd.to_datetime(Daebu_daily['date'])
 Ulsan_daily['date'] = pd.to_datetime(Ulsan_daily['date'])
 
-### For splitting
-
-df1_p1 = Beijing_daily.loc[(Beijing_daily['date'] > '2019-11-01') & (Beijing_daily['date'] < '2020-03-31')]
-df2_p1 = Shanghai_daily.loc[(Shanghai_daily['date'] > '2019-11-01') & (Shanghai_daily['date'] < '2020-03-31')]
-df3_p1 = Shenzhen_daily.loc[(Shenzhen_daily['date'] > '2019-11-01') & (Shenzhen_daily['date'] < '2020-03-31')]
-df4_p1 = Hamburg_daily.loc[(Hamburg_daily['date'] > '2019-11-01') & (Hamburg_daily['date'] < '2020-03-31')]
-df5_p1 = Siheung_daily.loc[(Siheung_daily['date'] > '2019-11-01') & (Siheung_daily['date'] < '2020-03-31')]
-df6_p1 = Incheon_daily.loc[(Incheon_daily['date'] > '2019-11-01') & (Incheon_daily['date'] < '2020-03-31')]
-df7_p1 = Yeosu_daily.loc[(Yeosu_daily['date'] > '2019-11-01') & (Yeosu_daily['date'] < '2020-03-31')]
-df8_p1 = Seoul_daily.loc[(Seoul_daily['date'] > '2019-11-01') & (Seoul_daily['date'] < '2020-03-31')]
-df9_p1 = Daebu_daily.loc[(Daebu_daily['date'] > '2019-11-01') & (Daebu_daily['date'] < '2020-03-31')]
-df10_p1 = Ulsan_daily.loc[(Ulsan_daily['date'] > '2019-11-01') & (Ulsan_daily['date'] < '2020-03-31')]
-df11_p1 = Kassel1_daily.loc[(Kassel1_daily['date']  > '2019-11-01') & (Kassel1_daily['date'] < '2020-03-31')]
-df12_p1 = Kassel2_daily.loc[(Kassel2_daily['date']  > '2019-11-01') & (Kassel2_daily['date'] < '2020-03-31')]
-
-boxdata = [list(df1_p1['pm25_conc'].dropna()),
-           list(df2_p1['pm25_conc'].dropna()),
-           list(df3_p1['pm25_conc'].dropna()),
-           list(df4_p1['pm25_conc'].dropna()),
-           list(df5_p1['PM25'].dropna()),
-           list(df6_p1['PM25'].dropna()),
-           list(df7_p1['PM25'].dropna()),
-           list(df8_p1['PM25'].dropna()),
-           list(df9_p1['PM25'].dropna()),
-           list(df10_p1['PM25'].dropna()),
-           list(df11_p1['pm25_conc'].dropna()),
-           list(df12_p1['pm25_conc'].dropna())]
-
-## For boxplot
-plt.figure(figsize=(8,8))
-#sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
-plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg',
-                             'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan', 'Kassel1','Kassel2'])
-plt.ylim([0,100])
-plt.xticks(rotation=45)
-plt.yticks(np.arange(0,110,10))
-plt.ylabel('Concentration ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
-plt.title("2019-11-01 to 2020-03-31")
-plt.grid(True, which='major', linestyle='--', linewidth=0.5)
-plt.tight_layout()
-plt.show()
-
 #### Data splitting from start to end
 
-start_date = '2019-11-01'
-end_date = '2020-03-31'
+start_date = '2020-04-01'
+end_date = '2020-10-31'
 
 df1_p2 = Beijing_daily.loc[(Beijing_daily['date'] > start_date) & (Beijing_daily['date'] < end_date)]
 df2_p2 = Shanghai_daily.loc[(Shanghai_daily['date'] > start_date) & (Shanghai_daily['date'] < end_date)]
@@ -329,11 +287,12 @@ names = ['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung',
 order = [0,1,3,10,4,9,6,5,7,8]
 boxdata = [boxdata[i] for i in order]
 
-
 ## For boxplot
 plt.figure(figsize=(8,8))
 #sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
 plt.boxplot(boxdata, labels=[names[i] for i in order])
+plt.plot([0,11],[25,25], 'b--', label='WHO guideline')
+plt.xlim([0.5,10.5])
 plt.ylim([0,100])
 plt.xticks(rotation=45)
 plt.yticks(np.arange(0,110,10))
@@ -341,6 +300,7 @@ plt.title(str(start_date) + " to " + str(end_date))
 plt.ylabel('Concentration ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
 plt.grid('--', linewidth=0.5)
 plt.tight_layout()
+plt.legend()
 plt.show()
 
 
@@ -363,28 +323,6 @@ plt.xticks(rotation=45)
 plt.ylim([0,350])
 plt.tight_layout()
 plt.legend()
-plt.show()
-
-
-
-
-boxdata = [list(Beijing['pm25_conc'].dropna()),
-           list(Shanghai['pm25_conc'].dropna()),
-           list(Shenzhen['pm25_conc'].dropna()),
-           list(Hamburg['pm25_conc'].dropna()),
-           list(Siheung_daily['PM25'].dropna()),
-           list(Incheon_daily['PM25'].dropna()),
-           list(Yeosu_daily['PM25'].dropna()),
-           list(Seoul_daily['PM25'].dropna()),
-           list(Daebu_daily['PM25'].dropna()),
-           list(Ulsan_daily['PM25'].dropna())]
-
-
-## For boxplot
-plt.figure(figsize=(10,10))
-#sns.boxplot(x='Beijing',y='concentration',data=list(Beijing['pm25_conc'].dropna()))
-plt.boxplot(boxdata, labels=['Beijing', 'Shanghai','Shenzhen', 'Hamburg', 'Siheung','Incheon','Yeosu','Seoul','Daebu','Ulsan'])
-plt.ylim([0,150])
 plt.show()
 
 
