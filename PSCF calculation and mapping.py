@@ -4,6 +4,13 @@
 import pandas as pd
 import os
 
+import matplotlib.pyplot as plt
+import cartopy
+import numpy as np
+import datetime
+from scalebar import scale_bar
+from scipy.interpolate import interp2d
+
 
 def cal_wpscf(row):
     if row['No_of_Data'] > 3 * avg_endpoint:
@@ -52,16 +59,70 @@ for file in os.listdir('./PSCF_txtfiles'):
 results['Lon'] = data['Lon']
 results['Lat'] = data['Lat']
 
-results.to_excel('results_summary.xlsx', index=False)
+results.to_csv('results_summary_210618.csv', index=False)
 
 print('Done!')
 
 
 # 2. Mapping
+import matplotlib.colors as mcolors
+colors = [(1,0,0,c) for c in np.linspace(0,1,100)]
+cmapred = mcolors.LinearSegmentedColormap.from_list('mycmap', colors, N=5)
+colors = [(0,0,1,c) for c in np.linspace(0,1,100)]
+cmapblue = mcolors.LinearSegmentedColormap.from_list('mycmap', colors, N=5)
+results = pd.read_csv('results_summary_210618.csv')
 
-import matplotlib.pyplot as plt
-import cartopy
-import numpy as np
-import datetime
-from scalebar import scale_bar
+df = pd.DataFrame()
+df['seasalts'] = results['seasalts']
+df['Lon'] = results['Lon']
+df['Lat'] = results['Lat']
 
+df = df.drop(df[df['seasalts']==0.0].index, 0)
+
+plt.figure(figsize=(10, 8))
+ax = plt.axes(projection=cartopy.crs.PlateCarree())
+
+ax.add_feature(cartopy.feature.LAND)
+ax.add_feature(cartopy.feature.OCEAN, facecolor='lightblue')
+ax.add_feature(cartopy.feature.COASTLINE)
+ax.add_feature(cartopy.feature.BORDERS, linestyle=':')
+ax.add_feature(cartopy.feature.LAKES, alpha=0.5)
+ax.add_feature(cartopy.feature.RIVERS)
+
+lon1, lon2, lat1, lat2 = 110.0, 150.0, 25.0, 60.0
+ax.set_extent([lon1, lon2, lat1, lat2], crs=cartopy.crs.PlateCarree())
+gl = ax.gridlines(draw_labels=True, crs=cartopy.crs.PlateCarree(), linestyle='--')
+gl.xlabel_style = {'size': 15}
+gl.ylabel_style = {'size': 15}
+
+
+
+df_z = df['seasalts']
+# points = plt.scatter(results['Lon'], results['Lat'], c=df_z,
+#                      vmin=0.002, vmax=1,
+#                      cmap='Reds',
+#                      alpha=1.0,
+#                      s=10.0)
+
+
+#plt.colormesh(df['Lon'],df['Lat'],df_z,cmap=cmapblue)
+
+
+f = interp2d(df['Lon'],df['Lat'],df_z,kind="linear")
+Z = f(df['Lon'],df['Lat'])
+extent = [df['Lon'].min(), df['Lon'].max(), df['Lat'].min(), df['Lat'].max()]
+
+
+im = plt.imshow(Z, extent=extent,
+                interpolation='nearest', cmap=cmapred, vmin=0, vmax=1,
+               alpha=0.7)
+cb = plt.colorbar(im, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
+
+cb.set_label(label='WPSCF', size=20)
+cb.ax.tick_params(labelsize=20)
+plt.tight_layout()
+
+#plt.legend(title='[' + day + ']', loc='upper right')
+#plt.savefig('./test2/test_' + str(day).replace('/', '_') + '.jpg')
+plt.show()
+plt.close()
