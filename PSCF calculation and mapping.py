@@ -27,14 +27,14 @@ def cal_wpscf(row):
 results = pd.DataFrame()
 
 # File loading
-for file in os.listdir('./PSCF_txtfiles'):
+for file in os.listdir('./PSCF_txtfiles_72h'):
 
     # print source name
     name = file[12:-4]
 
     print(name)
 
-    data = pd.read_table('./PSCF_txtfiles/'+file)
+    data = pd.read_table('./PSCF_txtfiles_72h/'+file)
     data = data[22:-1]
 
     data = data.iloc[:, 0].str.split(",", expand=True)
@@ -47,7 +47,7 @@ for file in os.listdir('./PSCF_txtfiles'):
     n = len(data)
     sum_endpoint = data['No_of_Data'].sum()
     avg_endpoint = sum_endpoint/n
-
+    print(avg_endpoint)
     data['WPSCF'] = data.apply(cal_wpscf, axis=1)
 
     results[name] = data['WPSCF']
@@ -60,7 +60,7 @@ for file in os.listdir('./PSCF_txtfiles'):
 results['Lon'] = data['Lon']
 results['Lat'] = data['Lat']
 
-results.to_csv('results_summary_210618.csv', index=False)
+results.to_csv('PSCF_results_summary_210625.csv', index=False)
 
 print('Done!')
 
@@ -73,7 +73,7 @@ import matplotlib.colors as mcolors
 
 for source in results.columns[:-2]:
 
-    results = pd.read_csv('results_summary_210618.csv')
+    results = pd.read_csv('PSCF_results_summary_210625.csv')
 
     df = pd.DataFrame()
     df[source] = results[source]
@@ -93,7 +93,7 @@ for source in results.columns[:-2]:
     ax.add_feature(cartopy.feature.LAKES, alpha=0.5)
     ax.add_feature(cartopy.feature.RIVERS)
 
-    lon1, lon2, lat1, lat2 = 115.0, 135.0, 25.0, 48.0
+    lon1, lon2, lat1, lat2 = 105.0, 145.0, 20.0, 58.0
     ax.set_extent([lon1, lon2, lat1, lat2], crs=cartopy.crs.PlateCarree())
     gl = ax.gridlines(draw_labels=True, crs=cartopy.crs.PlateCarree(), linestyle='--')
     gl.xlabel_style = {'size': 15}
@@ -121,6 +121,6 @@ for source in results.columns[:-2]:
     # plt.tight_layout()
 
     plt.title('[' + source + ']')
-    plt.savefig(source + '_24h' + '.jpg')
+    plt.savefig(source + '_72h' + '.jpg')
     plt.show()
     plt.close()

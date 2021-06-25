@@ -539,3 +539,81 @@ health.to_csv('health_v8_all time_210624.csv')
 # end of all time calculation
 
 
+# For Seoul and Daebu
+df_Daebu = pd.read_csv('D:\\Dropbox\\PMF_paper\\건강영향파트\\Seoul_Daebu_raw.csv').loc[0]
+df_Seoul = pd.read_csv('D:\\Dropbox\\PMF_paper\\건강영향파트\\Seoul_Daebu_raw.csv').loc[1]
+
+df_Daebu['Cr_6'] = df_Daebu['Cr'] *0.3
+df_Daebu['Cr_3'] = df_Daebu['Cr'] *0.7
+
+df_Seoul['Cr_6'] = df_Seoul['Cr'] *0.3
+df_Seoul['Cr_3'] = df_Seoul['Cr'] *0.7
+
+
+a = pd.DataFrame()
+data = df_Daebu
+results = pd.DataFrame()
+for element in elements:
+    Ing_R = factor_basics.loc[0][gender]
+    EF = factor_basics.loc[1][gender]
+    ED = factor_basics.loc[2][gender]
+    BW = factor_basics.loc[3][gender]
+    SA = factor_basics.loc[4][gender]
+    AF = factor_basics.loc[5][gender]
+    ET = factor_basics.loc[6][gender]
+    AT1 = factor_basics.loc[7][gender]
+    AT2 = factor_basics.loc[8][gender]
+    CF = factor_basics.loc[9][gender]
+
+    RfD0 = factor_elements.loc[0][element]
+    RfCi = factor_elements.loc[1][element]
+    GIABS = factor_elements.loc[2][element]
+    IUR = factor_elements.loc[3][element]
+    SF0 = factor_elements.loc[4][element]
+    ABS = factor_elements.loc[5][element]
+    C = data[element]
+
+    temp = ["Daebu, " + str(element)]
+    temp.append(ILCR(C, Ing_R, EF, ED, BW, AT1, CF, SA, AF, ABS, ET, AT2, IUR, SF0, GIABS))
+    temp.append(HQ(C, Ing_R, EF, ED, BW, AT1, CF, SA, AF, ABS, ET, AT2, RfCi, RfD0, GIABS))
+
+    results = results.append(pd.DataFrame([temp]), ignore_index=True)
+temp = results.sum()
+temp[0] = "**Sum, Daebu"
+results = results.append(temp, ignore_index=True)
+
+
+
+a = pd.DataFrame()
+data = df_Seoul
+
+for element in elements:
+    Ing_R = factor_basics.loc[0][gender]
+    EF = factor_basics.loc[1][gender]
+    ED = factor_basics.loc[2][gender]
+    BW = factor_basics.loc[3][gender]
+    SA = factor_basics.loc[4][gender]
+    AF = factor_basics.loc[5][gender]
+    ET = factor_basics.loc[6][gender]
+    AT1 = factor_basics.loc[7][gender]
+    AT2 = factor_basics.loc[8][gender]
+    CF = factor_basics.loc[9][gender]
+
+    RfD0 = factor_elements.loc[0][element]
+    RfCi = factor_elements.loc[1][element]
+    GIABS = factor_elements.loc[2][element]
+    IUR = factor_elements.loc[3][element]
+    SF0 = factor_elements.loc[4][element]
+    ABS = factor_elements.loc[5][element]
+    C = data[element]
+
+    temp = ["Seoul, " + str(element)]
+    temp.append(ILCR(C, Ing_R, EF, ED, BW, AT1, CF, SA, AF, ABS, ET, AT2, IUR, SF0, GIABS))
+    temp.append(HQ(C, Ing_R, EF, ED, BW, AT1, CF, SA, AF, ABS, ET, AT2, RfCi, RfD0, GIABS))
+
+    results = results.append(pd.DataFrame([temp]), ignore_index=True)
+temp = results.sum()
+temp[0] = "**Sum, Seoul"
+results = results.append(temp, ignore_index=True)
+
+results.to_csv('HR_Seoul_Daebu.csv', index=False)
