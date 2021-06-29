@@ -38,19 +38,28 @@ data_nonhaze = data[(data$PM25_observed<35.0), ]
 
 # Drawing
 
-for(i in colnames(data)){
+# for percentile
+
+for(i in colnames(data)[45:53]) {
 
   if (i != 'date' & i != 'wd' & i != 'ws'){
     print(i)
-    jpeg(paste(i,'.jpeg'))
-    polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
-              key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i)
-    dev.off()
+    
+    for (per in seq(0,90,10)){
+      
+      jpeg(paste(i,', ',per,' to ',per+10,'.jpeg'))
+      polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
+                stati = 'cpf', percentile= c(per,per+10),
+                #key.header = "mean PM25(ug/m3)", 
+                key.footer = NULL, main = i)
+      dev.off()
     }
+  }
+    
 }
 
 
-
+# for original
 for(i in colnames(data)){
   
   if (i != 'date' & i != 'wd' & i != 'ws'){
@@ -62,8 +71,12 @@ for(i in colnames(data)){
   }
 }
 
-polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
-          key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i)
+# 참고자료
+
+
+polarPlot(data, pollutant = 'coal', col = "jet", key.position = "bottom",
+          key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i,
+          statistic= 'cpf', percentile = 75,type="weekday")
 
 polarPlot(data, pollutant = "PM25_observed", col = "jet", key.position = "bottom",
           key.header = "mean PM25(ug/m3)", key.footer = NULL, main = 'A')

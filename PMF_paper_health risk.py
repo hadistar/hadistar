@@ -4,12 +4,14 @@ import scipy.stats
 
 
 def ADD_ing(C, Ing_R, EF, ED, BW, AT1, CF):
-    temp = (C*Ing_R*EF*ED*CF/(BW*AT1))*1e-6
-    return temp
+    temp = (C*Ing_R*EF*ED*CF/(BW*AT1))/23.5
+    # return temp
+    return 0
 
 def ADD_derm(C,SA,AF,ABS,EF,ED,BW,AT1,CF):
-    temp = (C*SA*AF*ABS*EF*ED*CF/(BW*AT1))*1e-6
-    return temp
+    temp = (C*SA*AF*ABS*EF*ED*CF/(BW*AT1))/23.5
+     # return temp
+    return 0
 
 def ADD_inh(C,ET,EF,ED,AT2):
     return(C*ET*EF*ED/AT2)
