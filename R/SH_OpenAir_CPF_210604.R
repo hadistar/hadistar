@@ -1,3 +1,4 @@
+#Testing 210630
 
 library(openair)
 
@@ -59,17 +60,32 @@ for(i in colnames(data)[45:53]) {
 }
 
 
-# for original
+# for CPF
 for(i in colnames(data)){
   
   if (i != 'date' & i != 'wd' & i != 'ws'){
     print(i)
-    jpeg(paste(i,'.jpeg'))
-    polarPlot(data_nonhaze, pollutant = i, col = "jet", key.position = "bottom",
-              key.header = "mean PM25(ug/m3)", key.footer = NULL, main = i)
+    jpeg(paste(i,'_polarplot.jpeg'))
+    polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
+              key.header = "mean PM25(ug/m3)", key.footer = NULL)
     dev.off()
   }
 }
+
+
+# for polar plot
+for(i in colnames(data)){
+  
+  if (i != 'date' & i != 'wd' & i != 'ws'){
+    print(i)
+    jpeg(paste(i,'_p25.jpeg'))
+    polarPlot(data, pollutant = i, col = "jet", key.position = "bottom",
+              key.header = "Probability", key.footer = NULL,
+              statistic= 'cpf', percentile = 75)
+    dev.off()
+  }
+}
+
 
 # 참고자료
 

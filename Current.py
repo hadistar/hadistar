@@ -66,3 +66,13 @@ for i, row in df.iterrows():
     data = data.append(target)
 
 data.to_csv('AirKora_2019_2020_SH_100km.csv', encoding='euc-kr')
+
+
+
+
+
+
+from plotnine.data import mpg
+from plotnine import *
+
+ggplot(mpg) + aes(x="class") + geom_bar()
