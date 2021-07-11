@@ -92,6 +92,6 @@ for station in station_list:
     temp = temp.groupby(pd.Grouper(freq='M', key='date')).mean()
     df12 = df12.append(temp, sort=False)
 
-df12
+df12.to_csv('results_df12.csv')
 
 
