@@ -87,11 +87,20 @@ df11 = df5.groupby(['Station code', pd.Grouper(freq='M', key='date')], as_index=
 station_list = df5['Station code'].unique()
 df12 = pd.DataFrame()
 for station in station_list:
-    print (station)
-    temp = df5.loc[df5['Station code']==station]
+    print(station)
+    temp = df5.loc[df5['Station code'] == station]
     temp = temp.groupby(pd.Grouper(freq='M', key='date')).mean()
     df12 = df12.append(temp, sort=False)
 
 df12.to_csv('results_df12.csv')
 
 
+# Additional task
+
+import matplotlib.pyplot as plt
+
+plt.figure()
+plt.plot(df12.loc[df12['Station code']==111121].index, df12.loc[df12['Station code']==111121]['PM25_mean'], color='red')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
