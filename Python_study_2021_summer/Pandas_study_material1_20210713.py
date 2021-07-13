@@ -1,13 +1,15 @@
 
+# Test
+
 # For pandas study
 # Main contents: merge, groupby (grouper), row calculation function
 # Written by Young Su Lee
 # 2021-07-11
 # required file: 210713_PM2.5_mean_day.csv, 210713_AirKorea_20191103.csv
 
-
 import pandas as pd
 import os
+
 os.getcwd()
 os.chdir('D:/hadistar/Python_study_2021_summer')
 
@@ -27,7 +29,7 @@ df4 = df4.reset_index(drop=True)
 
 # 2. Row calculation function
 
-#PM2.5 criteria: 0< <=15: good , 15< <=35: normal, 35< <=75: bad, 75<: very bad
+#PM2.5 criteria: 0<x<=15: good , 15<x<=35: normal, 35<x<=75: bad, 75<x: very bad
 def cal_criteria(row):
     if row['PM25_mean'] > 75:
         return 'very bad'
@@ -93,7 +95,6 @@ for station in station_list:
     df12 = df12.append(temp, sort=False)
 
 df12.to_csv('results_df12.csv')
-
 
 # Additional task
 
