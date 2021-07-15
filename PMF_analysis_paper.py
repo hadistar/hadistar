@@ -372,12 +372,12 @@ meteo['date'] = pd.to_datetime(meteo['date'])
 
 data = pd.DataFrame()
 
-for n in range(len(df)):
-    print(n)
-    for i in range(24):
-        temp = df.iloc[n].copy()
-        temp['date'] = temp['date'] + pd.to_timedelta(i, unit='h')
-        data = data.append(temp, sort=False)
+    for n in range(len(df)):
+        print(n)
+        for i in range(24):
+            temp = df.iloc[n].copy()
+            temp['date'] = temp['date'] + pd.to_timedelta(i, unit='h')
+            data = data.append(temp, sort=False)
 
 data = data[df.columns] # Ordering
 data['date'] = pd.to_datetime(data['date'])
