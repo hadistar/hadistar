@@ -46,7 +46,7 @@ plt.plot(df4.date, df4.PM25_mean, 'k-', linewidth=0.5)
 plt.plot(df3.loc[df3['Station code']==823801]['date'], df3.loc[df3['Station code']==823801]['PM25_mean'],
          'g>', markersize=2)
 plt.plot(df3.loc[df3['Station code']==131144]['date'], df3.loc[df3['Station code']==131144]['PM25_mean'],
-         'r-', linewidth=0.5)
+         'r--', linewidth=0.5)
 plt.show()
 
 
@@ -90,7 +90,8 @@ plt.plot(df3.loc[df3['Station code']==131144]['date'], df3.loc[df3['Station code
 
 plt.title('Test graph')
 plt.xlabel('Date')
-plt.xlim([datetime.date(2019,1,1), datetime.date(2019,6,30)])
+plt.xlim([datetime.date(2019,1,1),
+          datetime.date(2019,6,30)])
 plt.ylabel('Concentration')
 plt.ylim([0,100])
 plt.xticks(rotation=45)
@@ -106,14 +107,17 @@ plt.show()
 
 # cmap list:
 plt.figure()
-plt.scatter(df2.Longitude, df2.Latitude, c=df2.PM25,
-            vmin = 0, vmax = 100,
+plt.scatter(df2.Longitude,
+            df2.Latitude,
+            c=df2.PM25,
+            vmin = 0, vmax = df2.PM25.max(),
             cmap = 'Reds')
 
 plt.show()
 
 
 # cmap list: https://matplotlib.org/stable/tutorials/colors/colormaps.html
+
 plt.figure()
 plt.scatter(df2.Longitude, df2.Latitude, c=df2.PM25,
             vmin = 0, vmax = 50,
@@ -127,8 +131,9 @@ plt.figure()
 points = plt.scatter(df2.Longitude, df2.Latitude, c=df2.PM25,
             vmin = 0, vmax = 50,
             cmap = 'bwr', alpha = 0.9, s = 3.0)
-cb = plt.colorbar(points, orientation='vertical', # horizontal or vertical
-                  ticklocation='auto', shrink=0.5, pad=0.1)
+cb = plt.colorbar(points, orientation='horizontal', # horizontal or vertical
+                  ticklocation='auto', shrink=0.5, pad=0.01)
+plt.clim(0, 150)
 plt.show()
 
 
