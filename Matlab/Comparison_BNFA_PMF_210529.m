@@ -33,10 +33,20 @@ P_q10 = table2array(P_q10(:, 2:end));
 P_q5_orig = readtable('.\PMF_forcomparison_210508\210525q5_profiles2_(percent of species sum).csv');
 P_q5_orig = table2array(P_q5_orig(2:end, 2:end));
 
+P_q6_orig = readtable('.\PMF_forcomparison_210508\210525q6_profiles2.csv');
+P_q6_orig = table2array(P_q6_orig(2:end, 2:end));
+
+P_q7_orig = readtable('.\PMF_forcomparison_210508\210529q7_profiles2.csv');
+P_q7_orig = table2array(P_q7_orig(2:end, 2:end));
+
+P_q8_orig = readtable('.\PMF_forcomparison_210508\210529q8_profiles2.csv');
+P_q8_orig = table2array(P_q8_orig(2:end, 2:end));
+
+
 figure
 for k=1:q
     subplot(q,1,k)
-    P_bargraph = P_q5_orig(:,k);
+    P_bargraph = P_q7_orig(:,k);
     
     bar(1:J,P_bargraph )
     set(gca,'xtick',[1:J],'xticklabel',species_name)
@@ -50,10 +60,10 @@ for k=1:q
     end
     
 
-% Rescaling for BNFA
+% Rescaling for BNFA (from species sum 1 to source sum 1)
 
-target1 = P_q8;
-target2 = G_q8;
+target1 = P_q8(:,[6 4 3 2 5 7 8 1]);
+target2 = G_q8(:,[6 4 3 2 5 7 8 1]);
 
 scale = sum(target1);
 scaled_profile = (target1./scale)*100;
@@ -105,5 +115,8 @@ for k=1:q
 end
 
 
+
+
+% Rescaling from source sum=1 to species sum=1
 
 
