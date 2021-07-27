@@ -70,9 +70,28 @@ data.to_csv('AirKora_2019_2020_SH_100km.csv', encoding='euc-kr')
 
 
 
+import pandas as pd
+
+df = pd.read_csv('AirKora_2019_2020_SH_100km.csv')
+
+df['date'] = pd.to_datetime(df['date'])
+
+df2 = df.groupby(pd.Grouper(freq='Y', key='date'), 'Station code').mean()
 
 
-from plotnine.data import mpg
-from plotnine import *
 
-ggplot(mpg) + aes(x="class") + geom_bar()
+df.loc[df['date']=='2020-06-26'].to_csv('AirKora_2019_2020_SH_100km_20200626.csv')
+
+
+
+df = pd.read_excel('PM2.5_mean_day.xlsx')
+df2 = pd.read_csv('AirKora_2019_2020_SH_100km.csv')
+df2 = df2.loc[df2['date']=='2020-12-01']
+df2 = df2[['Station code', 'lon', 'lat']]
+
+data = pd.merge(df, df2, how='left', on='Station code')
+
+data.to_csv('PM25_mean_day.csv', index=False)
+
+
+

@@ -9,6 +9,7 @@ df = pd.read_csv('C:\\Dropbox\\PMF_paper\\PMF results_raw\\210607recal_Constrain
 df_contri = pd.read_csv('C:\\Dropbox\\PMF_paper\\PMF results_raw\\210607recal_ConstrainedErrorEstimationSummary_v8_contribution.csv').dropna()
 df_contri['date'] = pd.to_datetime(df_contri['date'], format='%m-%d-%y %H:%M')
 
+
 Sources_name = ['Sea salts','Soil', 'Secondary sulfate',
                 'Coal combustion','Biomass burning','Industry (smelting)','Industry (oil)',
                 'Combustion for heating', 'Secondary Nitrate','Mobile']
@@ -25,6 +26,14 @@ for i, s in enumerate(Sources_name):
     data['EV_'+s] = df.iloc[:,41+i]
 
 data = data.drop(0, axis=0)
+
+df_contri = df_contri[['date','Secondary Nitrate','Secondary sulfate','Mobile','Combustion for heating',
+                       'Biomass burning','Coal combustion','Industry (oil)', 'Industry (smelting)','Sea salts','Soil']]
+
+Sources_name = list(df_contri.columns[1:])
+
+
+
 
 Species_name = list(data.Species)
 Species_name[:6] = ['NO$_3$$^-$', 'SO$_4$$^{2-}$', 'NH$_4$$^+$', 'K$^+$', 'Na$^+$', 'Cl$^-$']
@@ -69,6 +78,8 @@ plt.show()
 
 # Contribution plot
 
+contri_percent = df_contri.mean(numeric_only=True)/df_contri.mean(numeric_only=True).sum()*100
+
 fig, axes = plt.subplots(nrows=10, ncols=1, figsize=(12,24), sharex=True)
 
 for i, s in enumerate(Sources_name):
@@ -78,7 +89,7 @@ for i, s in enumerate(Sources_name):
     ax1.plot(df_contri['date'], df_contri[s], 'k-')
     ax1.fill_between(df_contri['date'],0,df_contri[s], color='lightgrey')
     ax1.text(1.0,0.8,
-             s+" "+str(df_contri[s].mean().round(2))+" ${\mu}$" +'g/m'+"$^3$",
+             s+" "+str(df_contri[s].mean().round(2))+" ${\mu}$" +'g/m'+"$^3$ ("+str(contri_percent[i].round(2))+"%)  ",
              size=18, ha='right', transform=ax1.transAxes)
     ax1.set_ylim(bottom=0)
     max = math.ceil(df_contri[s].max()) + 4 - math.ceil(df_contri[s].max()) % 4
