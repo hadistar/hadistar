@@ -19,7 +19,7 @@ extent = [lon1, lon2, lat1, lat2]
 
 plt.figure()
 ax = df.plot(figsize=(10, 10), alpha=1.0, edgecolor='r', facecolor='none')
-ctx.add_basemap(ax, zoom=13, crs='epsg:4326')
+#ctx.add_basemap(ax, zoom=13, crs='epsg:4326')
 plt.plot(data['lon'], data['lat'], color='blue', marker='X',
          linestyle='None', markersize=10, label='Monitoring Site')
 ax.set_xlim(lon1, lon2)

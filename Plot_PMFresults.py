@@ -5,14 +5,17 @@ import math
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['font.size'] = 13
 
-df = pd.read_csv('C:\\Dropbox\\PMF_paper\\PMF results_raw\\210607recal_ConstrainedErrorEstimationSummary_v8.csv')
-df_contri = pd.read_csv('C:\\Dropbox\\PMF_paper\\PMF results_raw\\210607recal_ConstrainedErrorEstimationSummary_v8_contribution.csv').dropna()
+df = pd.read_csv('D:\\Dropbox\\PMF_paper\\PMF results_raw\\210607recal_ConstrainedErrorEstimationSummary_v8.csv')
+df_contri = pd.read_csv('D:\\Dropbox\\PMF_paper\\PMF results_raw\\210607recal_ConstrainedErrorEstimationSummary_v8_contribution.csv').dropna()
 df_contri['date'] = pd.to_datetime(df_contri['date'], format='%m-%d-%y %H:%M')
+
+df_contri = df_contri.rename(columns={'Secondary Nitrate':'Secondary nitrate'})
+df_contri = df_contri.rename(columns={'Mobile':'Traffic'})
 
 
 Sources_name = ['Sea salts','Soil', 'Secondary sulfate',
                 'Coal combustion','Biomass burning','Industry (smelting)','Industry (oil)',
-                'Combustion for heating', 'Secondary Nitrate','Mobile']
+                'Combustion for heating', 'Secondary nitrate','Traffic']
 
 data = pd.DataFrame()
 data['Species'] = df['Species']
@@ -27,7 +30,7 @@ for i, s in enumerate(Sources_name):
 
 data = data.drop(0, axis=0)
 
-df_contri = df_contri[['date','Secondary Nitrate','Secondary sulfate','Mobile','Combustion for heating',
+df_contri = df_contri[['date','Secondary nitrate','Secondary sulfate','Traffic','Combustion for heating',
                        'Biomass burning','Coal combustion','Industry (oil)', 'Industry (smelting)','Sea salts','Soil']]
 
 Sources_name = list(df_contri.columns[1:])
