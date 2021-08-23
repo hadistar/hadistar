@@ -37,7 +37,7 @@ plt.show()
 
 #
 plt.figure()
-plt.plot(df4.date, df4.PM25_mean, 'k-', linewidth=5)
+plt.plot(df4.date, df4.PM25_mean, 'k-', linewidth=0.5)
 plt.show()
 
 #

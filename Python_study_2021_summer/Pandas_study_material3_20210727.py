@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from sklearn import linear_model
 import sklearn
 import numpy as np
-
 plt.rcParams['font.family'] = 'Arial'
 plt.rcParams['font.size'] = 14
 
@@ -31,6 +30,7 @@ y = np.array(data.PM25_mean_y)
 # Create linear regression object
 linreg = linear_model.LinearRegression()
 # Fit the linear regression model
+
 model = linreg.fit(x.reshape(-1,1), y.reshape(-1,1))
 # Get the intercept and coefficients
 intercept = model.intercept_
@@ -46,7 +46,7 @@ plt.plot([0,140],[0,140], 'k--')
 plt.xlabel('Concentration (x) ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
 plt.ylabel('Concentration (y) ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
 plt.text(x.max() * 0.1, y.max() * 0.6,
-         'Y=%0.2fx+%0.2f\n$R^2$ = %0.2f (n=%s)'
+         'Y=%0.2f*x+%0.2f\n$R^2$ = %0.2f (n=%s)'
          % (coef, intercept, r_squared, format(len(x), ',')))
 plt.axis([0,140,0,140])
 plt.grid(True, linestyle='--')
@@ -143,7 +143,6 @@ plt.show()
 
 # 3. Integration
 from scipy.integrate import quad
-
 # 3-1. Linear curve integration
 I1 = quad(func1, 1, 2, args=tuple(popt1))
 print(I1)
@@ -176,5 +175,14 @@ for i, x_val in enumerate(x_list):
         y_val = 0.5*(func1(x_list[i],*popt1)+func1(x_list[i-1],*popt1))
         area = area + dx*y_val
 print(area)
+
+
+pibo = [1,1]
+for i in range(100):
+    if i == 0:
+        pass
+    else:
+        pibo.append(pibo[i]+pibo[i-1])
+
 
 
