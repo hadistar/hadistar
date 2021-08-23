@@ -5,8 +5,10 @@ from tensorflow import keras
 import IPython
 import keras_tuner as kt
 
-df = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\1_Basic_1_Seoul_raw.csv')
 
+case = '1_Basic_1_Seoul'
+
+df = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\'+case+'_raw.csv')
 scalingfactor = {}
 data_scaled = df.copy()
 
@@ -32,7 +34,7 @@ for s in range(len(seeds)):
     for ele in range(len(elements)):
         for iter in range(iteration):
 
-            name = '1_Basic_1_Seoul_result_'+ str(seeds[s])+'_DNN_'+str(elements_name[ele])+'_'+str(iter+1)
+            name = case + '_result_'+ str(seeds[s])+'_DNN_'+str(elements_name[ele])+'_'+str(iter+1)
 
             eraser = df.sample(int(len(df)*0.2), random_state=seeds[s]).index
             target = elements[ele]
@@ -82,7 +84,7 @@ for s in range(len(seeds)):
 
                 # Tune the learning rate for the optimizer
                 # Choose an optimal value from 0.01, 0.001, or 0.0001
-                hp_learning_rate = hp.Choice('learning_rate', values=[1e-3, 1e-4, 5e-5, 1e-5])
+                hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4, 1e-5])
 
                 model.compile(optimizer=keras.optimizers.Adam(learning_rate=hp_learning_rate),
                               loss='mse',
