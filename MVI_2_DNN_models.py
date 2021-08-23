@@ -106,13 +106,12 @@ for s in range(len(seeds)):
                                             directory='D:/kerastuner',
                                             project_name='D:/kerastuner/'+name)
 
-
             class ClearTrainingOutput(tf.keras.callbacks.Callback):
                 def on_train_end(*args, **kwargs):
                     IPython.display.clear_output(wait=True)
 
 
-            tuner.search(x_train, y_train, epochs=150, validation_data=(x_val, y_val),
+            tuner.search(x_train, y_train, epochs=50, validation_data=(x_val, y_val),
                          callbacks=[ClearTrainingOutput()])
 
             # Get the optimal hyperparameters
@@ -125,7 +124,7 @@ for s in range(len(seeds)):
             # Build the model with the optimal hyperparameters and train it on the data
             model = tuner.hypermodel.build(best_hps)
 
-            history = model.fit(x_train, y_train, epochs = 150, validation_data = (x_val, y_val))
+            history = model.fit(x_train, y_train, epochs = 120, validation_data = (x_val, y_val))
 
             y_predicted = model.predict(x_test)
             evaluation = model.evaluate(x_test, y_test)
@@ -152,7 +151,6 @@ for s in range(len(seeds)):
 
             for c in y_predicted:
                 y_predicted[c] = y_predicted[c] * scalingfactor[c][0] + scalingfactor[c][1]
-
 
             y_predicted.to_csv(name+'.csv', index=False)
 
