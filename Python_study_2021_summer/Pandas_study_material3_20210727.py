@@ -161,7 +161,6 @@ plt.ylim([0,150])
 plt.legend()
 plt.show()
 
-
 ### Integration by definition
 
 x_list = np.linspace(1,2,10**5)
