@@ -8,10 +8,11 @@ from tensorflow import keras
 import IPython
 import os
 import scipy.stats
-import kerastuner as kt
+import keras_tuner as kt
 
-data = pd.read_csv('data.csv')
-#data_na = pd.read_csv('data_withNa.csv')
+
+data_na = pd.read_csv('data\\Data_PM25_speciation_Seoul_horuly_withNa.csv')
+data = data_na.dropna().reset_index(drop=True)
 
 data['wd_g'] = data['wd_g'] - 180
 data['wd_s'] = data['wd_s'] - 180
@@ -48,7 +49,7 @@ for c in data.columns[1:]:
 
 # for ramdom selection
 
-na_rate = 0.15
+na_rate = 0.2
 n = data.shape[0]
 
 eraser = np.random.choice(n,int(n*na_rate), replace=False)
@@ -63,7 +64,7 @@ data_elementals.loc[eraser, elementals] = np.nan
 
 ions = ['SO42.', 'NO3.', 'Cl.', 'Na.', 'NH4.', 'K.', 'Mg2.', 'Ca2.']
 data_ions = data_scaled.copy()
-data_ions_answers = data_ion.loc[eraser, ions]
+data_ions_answers = data_ions.loc[eraser, ions]
 data_ions.loc[eraser, ions] = np.nan
 
 # for OC/EC

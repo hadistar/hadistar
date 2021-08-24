@@ -16,8 +16,8 @@ y = np.array(df.AirKorea)
 
 target_num = -1
 
-x = np.array(data_elementals_answers.iloc[:,target_num])
-y = np.array(data_elementals_predicted.iloc[:,target_num])
+#x = np.array(data_elementals_answers.iloc[:,target_num])
+#y = np.array(data_elementals_predicted.iloc[:,target_num])
 
 # Create linear regression object
 linreg = linear_model.LinearRegression()
