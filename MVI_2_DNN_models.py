@@ -6,7 +6,7 @@ import IPython
 import keras_tuner as kt
 
 
-case = '1_Basic_1_Seoul'
+case = '1_Basic_3_Ulsan'
 
 df = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\'+case+'_raw.csv')
 scalingfactor = {}
@@ -28,7 +28,7 @@ elementals = ['S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Ni', 'Cu', 'Zn', 'As
 elements = [ions,ocec,elementals, ions+ocec, ions+elementals, ocec+elementals]
 elements_name = ['ions', 'ocec','elementals','ion_ocec','ion_elementals','ocec_elementals']
 
-iteration = 3
+iteration = 2
 
 for s in range(len(seeds)):
     for ele in range(len(elements)):
@@ -65,8 +65,8 @@ for s in range(len(seeds)):
 
                 for i in range(hp.Int('num_layers', 2, 15)):
                     model.add(keras.layers.Dense(units=hp.Int('units',
-                                                              min_value=512,
-                                                              max_value=2048,
+                                                              min_value=256,
+                                                              max_value=4096,
                                                               step=32),
                                                  activation=hp.Choice('activation_function',
                                                                       values=[
@@ -84,7 +84,7 @@ for s in range(len(seeds)):
 
                 # Tune the learning rate for the optimizer
                 # Choose an optimal value from 0.01, 0.001, or 0.0001
-                hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4, 1e-5])
+                hp_learning_rate = hp.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4, 1e-5, 1e-6])
 
                 model.compile(optimizer=keras.optimizers.Adam(learning_rate=hp_learning_rate),
                               loss='mse',
@@ -104,7 +104,7 @@ for s in range(len(seeds)):
 
             tuner = kt.BayesianOptimization(model_builder,
                                             objective='val_accuracy',
-                                            max_trials=100,
+                                            max_trials=30,
                                             directory='D:/kerastuner',
                                             project_name='D:/kerastuner/'+name)
 
@@ -131,6 +131,9 @@ for s in range(len(seeds)):
             y_predicted = model.predict(x_test)
             evaluation = model.evaluate(x_test, y_test)
 
+            # For making total results
+
+
 
             f = open(name+'.txt', 'w')
             f.write(f"""
@@ -144,17 +147,17 @@ for s in range(len(seeds)):
             """)
             f.close()
 
-
-            y_predicted = pd.DataFrame(y_predicted, columns=target)
+            y_predicted_total = model.predict(np.array(data_wodate_scaled.drop(columns=target)))
+            y_predicted_total = pd.DataFrame(y_predicted_total, columns=target)
 
             # rescaling
             # x = x' * (max-min) + min
             # saving scaling factor in [max-min, min, max]
 
-            for c in y_predicted:
-                y_predicted[c] = y_predicted[c] * scalingfactor[c][0] + scalingfactor[c][1]
+            for c in y_predicted_total:
+                y_predicted_total[c] = y_predicted_total[c] * scalingfactor[c][0] + scalingfactor[c][1]
 
-            y_predicted.to_csv(name+'.csv', index=False)
+            y_predicted_total.to_csv(name+'.csv', index=False)
 
             del model
             del history
