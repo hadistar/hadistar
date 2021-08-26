@@ -48,3 +48,61 @@ df['weekday'] = df.date.dt.dayofweek+1
 df.to_csv('2_Informed_Ulsan_raw.csv', index=False)
 
 # Seeds: 777,1004,322,224,417
+
+# 3.Adding air pollution data
+
+Seoul_2 = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\2_Informed_1_Seoul_raw.csv')
+BR_2 = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\2_Informed_2_BR_raw.csv')
+Ulsan_2 = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\2_Informed_3_Ulsan_raw.csv')
+
+# Nearest location finding
+
+stations = pd.read_csv("D:\\OneDrive - SNU\\data\\AirKorea\\AirKorea_20191103_전국.csv", encoding='euc-kr')
+
+
+
+
+
+import os
+
+AirKorea_2018_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2018')
+AirKorea_2019_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2019')
+AirKorea_2020_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2020')
+
+AirKorea_2018 = pd.DataFrame()
+AirKorea_2019 = pd.DataFrame()
+AirKorea_2020 = pd.DataFrame()
+
+Seoul = pd.DataFrame()
+Incheon = pd.DataFrame()
+Yeosu = pd.DataFrame()
+Siheung = pd.DataFrame()
+Daebu = pd.DataFrame()
+Ulsan = pd.DataFrame()
+
+for i in range(len(AirKorea_2018_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2018\\'+AirKorea_2018_list[i])
+    Siheung = Siheung.append(temp.loc[temp['측정소코드'] == 131231])  # 시흥 측정소
+    Incheon = Incheon.append(temp.loc[temp['측정소코드'] == 823671])  # 인천 남동공단
+    Yeosu = Yeosu.append(temp.loc[temp['측정소코드'] == 336124])  # 여수산단로 1201
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == 111125])  # 서울 종로
+    Daebu = Daebu.append(temp.loc[temp['측정소코드'] == 131196])  # 대부도
+    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)
+
+for i in range(len(AirKorea_2019_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2019\\'+AirKorea_2019_list[i])
+    Siheung = Siheung.append(temp.loc[temp['측정소코드'] == 131231])  # 시흥 측정소
+    Incheon = Incheon.append(temp.loc[temp['측정소코드'] == 823671])  # 인천 남동공단
+    Yeosu = Yeosu.append(temp.loc[temp['측정소코드'] == 336124])  # 여수산단로 1201
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == 111125])  # 서울 종로
+    Daebu = Daebu.append(temp.loc[temp['측정소코드'] == 131196])  # 대부도
+    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)
+
+for i in range(len(AirKorea_2020_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2020\\'+AirKorea_2020_list[i])
+    Siheung = Siheung.append(temp.loc[temp['측정소코드'] == 131231])  # 시흥 측정소
+    Incheon = Incheon.append(temp.loc[temp['측정소코드'] == 823671])  # 인천 남동공단
+    Yeosu = Yeosu.append(temp.loc[temp['측정소코드'] == 336124])  # 여수산단로 1201
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == 111125])  # 서울 종로
+    Daebu = Daebu.append(temp.loc[temp['측정소코드'] == 131196])  # 대부도
+    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)

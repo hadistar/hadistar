@@ -70,4 +70,7 @@ for i, l in enumerate(pred_list):
     pred_cases.loc[i,'RMSE'] = results_RMSE
     pred_cases.loc[i,'MAE'] = results_MAE
 
-pred_cases.to_csv('results.csv', index=False)
+    for column in predicted.columns:
+        pred_cases.loc[i, 'r2_'+column] = r2_score(np.array(answer[column]), np.array(predicted[column]))
+
+pred_cases.to_csv('results_.csv', index=False)
