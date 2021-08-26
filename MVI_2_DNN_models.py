@@ -19,16 +19,16 @@ for c in df.columns[1:]:
 
 data_wodate_scaled = data_scaled.iloc[:, 1:]
 
-seeds = [777, 1004, 322, 224, 417]
+seeds = [777, 1004, 322] #, 224, 417]
 
 ions = ['SO42-', 'NO3-', 'Cl-', 'Na+', 'NH4+', 'K+', 'Mg2+', 'Ca2+']
 ocec = ['OC', 'EC']
 elementals = ['S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Ni', 'Cu', 'Zn', 'As', 'Se', 'Br', 'Pb']
 
 elements = [ions,ocec,elementals, ions+ocec, ions+elementals, ocec+elementals]
-elements_name = ['ions', 'ocec','elementals','ion_ocec','ion_elementals','ocec_elementals']
+elements_name = ['ions', 'ocec','elementals','ion-ocec','ion-elementals','ocec-elementals']
 
-iteration = 2
+iteration = 1
 
 for s in range(len(seeds)):
     for ele in range(len(elements)):
@@ -66,7 +66,7 @@ for s in range(len(seeds)):
                 for i in range(hp.Int('num_layers', 2, 15)):
                     model.add(keras.layers.Dense(units=hp.Int('units',
                                                               min_value=256,
-                                                              max_value=4096,
+                                                              max_value=2048,
                                                               step=32),
                                                  activation=hp.Choice('activation_function',
                                                                       values=[

@@ -63,6 +63,17 @@ plt.show()
 
 # KNN처리하기
 
+import pandas as pd
 from sklearn.impute import KNNImputer
+import numpy as np
+
+df = pd.read_csv('Smartcity_BSMRM_3Locations.csv')
+
+result = df.copy()
+
 imputer = KNNImputer(n_neighbors=3) #KNN
-Y= imputer.fit_transform(target)
+Y= imputer.fit_transform(df.iloc[:,1:].to_numpy())
+
+df.iloc[:,1:] = Y
+
+df.to_csv('Smartcity_BSMRM_3Locations_KNN.csv')
