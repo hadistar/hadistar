@@ -1,5 +1,6 @@
 import pandas as pd
 import random
+import numpy as np
 
 Seoul = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='수도권')
 Seoul.date = pd.to_datetime(Seoul.date)
@@ -55,13 +56,22 @@ Seoul_2 = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\2_Informed_1_Seoul_
 BR_2 = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\2_Informed_2_BR_raw.csv')
 Ulsan_2 = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\2_Informed_3_Ulsan_raw.csv')
 
-# Nearest location finding
+# Nearest station finding
 
 stations = pd.read_csv("D:\\OneDrive - SNU\\data\\AirKorea\\AirKorea_20191103_전국.csv", encoding='euc-kr')
+locations = pd.read_excel('D:\\Dropbox\\패밀리룸\\MVI\\Data\\pm25speciation_locations_KoreaNational.xlsx')
 
+Nearstations = []
 
+for loc in ['Seoul','BR', 'Ulsan']:
+    distance = []
+    temp = locations.loc[locations['location']==loc]
 
+    for i in stations.index:
+        temp_dist = (temp.lat-stations.iloc[i].Latitude)**2+(temp.lon-stations.iloc[i].Longitude)**2
+        distance.append(float(temp_dist))
 
+    Nearstations.append(stations.iloc[np.argmin(distance)]['측정소코드'])
 
 import os
 
@@ -74,35 +84,25 @@ AirKorea_2019 = pd.DataFrame()
 AirKorea_2020 = pd.DataFrame()
 
 Seoul = pd.DataFrame()
-Incheon = pd.DataFrame()
-Yeosu = pd.DataFrame()
-Siheung = pd.DataFrame()
-Daebu = pd.DataFrame()
+BR = pd.DataFrame()
 Ulsan = pd.DataFrame()
 
 for i in range(len(AirKorea_2018_list)):
     temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2018\\'+AirKorea_2018_list[i])
-    Siheung = Siheung.append(temp.loc[temp['측정소코드'] == 131231])  # 시흥 측정소
-    Incheon = Incheon.append(temp.loc[temp['측정소코드'] == 823671])  # 인천 남동공단
-    Yeosu = Yeosu.append(temp.loc[temp['측정소코드'] == 336124])  # 여수산단로 1201
-    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == 111125])  # 서울 종로
-    Daebu = Daebu.append(temp.loc[temp['측정소코드'] == 131196])  # 대부도
-    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+    BR = BR.append(temp.loc[temp['측정소코드'] == Nearstations[1]])  # 백령
+    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == Nearstations[2]])  # 울산
 
 for i in range(len(AirKorea_2019_list)):
     temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2019\\'+AirKorea_2019_list[i])
-    Siheung = Siheung.append(temp.loc[temp['측정소코드'] == 131231])  # 시흥 측정소
-    Incheon = Incheon.append(temp.loc[temp['측정소코드'] == 823671])  # 인천 남동공단
-    Yeosu = Yeosu.append(temp.loc[temp['측정소코드'] == 336124])  # 여수산단로 1201
-    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == 111125])  # 서울 종로
-    Daebu = Daebu.append(temp.loc[temp['측정소코드'] == 131196])  # 대부도
-    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+    BR = BR.append(temp.loc[temp['측정소코드'] == Nearstations[1]])  # 백령
+    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == Nearstations[2]])  # 울산
+
 
 for i in range(len(AirKorea_2020_list)):
     temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2020\\'+AirKorea_2020_list[i])
-    Siheung = Siheung.append(temp.loc[temp['측정소코드'] == 131231])  # 시흥 측정소
-    Incheon = Incheon.append(temp.loc[temp['측정소코드'] == 823671])  # 인천 남동공단
-    Yeosu = Yeosu.append(temp.loc[temp['측정소코드'] == 336124])  # 여수산단로 1201
-    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == 111125])  # 서울 종로
-    Daebu = Daebu.append(temp.loc[temp['측정소코드'] == 131196])  # 대부도
-    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == 238123])  # 울산 남구 부두로 9 (울산 산업단지)
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+    BR = BR.append(temp.loc[temp['측정소코드'] == Nearstations[1]])  # 백령
+    Ulsan = Ulsan.append(temp.loc[temp['측정소코드'] == Nearstations[2]])  # 울산
+
