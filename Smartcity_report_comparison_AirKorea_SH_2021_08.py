@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'Arial'
+plt.rc('font', family='Malgun Gothic')
 plt.rcParams['font.size'] = 13
 plt.rcParams.update({'figure.autolayout': True})
 
@@ -163,3 +164,79 @@ plt.figure(figsize=(16,4))
 plt.bar(elec.loc[elec['지역']=='소계'].date[:36], elec.loc[elec['지역']=='소계']['coal'][:36],
         width=5.5)
 plt.show()
+
+
+# <2021-08-30>
+
+# GG = 경기, BR=백령
+
+AirKorea_Seoul = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='수도권')
+AirKorea_Seoul.date = pd.to_datetime(AirKorea_Seoul.date)
+AirKorea_Seoul['date'] = AirKorea_Seoul['date'].dt.floor('h')
+AirKorea_Seoul = AirKorea_Seoul.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
+AirKorea_Seoul = AirKorea_Seoul.reset_index()
+AirKorea_Seoul = AirKorea_Seoul.loc[AirKorea_Seoul['date'] >= '2019-11-15']
+
+AirKorea_GG = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='경기권')
+AirKorea_GG.date = pd.to_datetime(AirKorea_GG.date)
+AirKorea_GG['date'] = AirKorea_GG['date'].dt.floor('h')
+AirKorea_GG = AirKorea_GG.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
+AirKorea_GG = AirKorea_GG.reset_index()
+AirKorea_GG = AirKorea_GG.loc[AirKorea_GG['date'] >= '2019-11-15']
+
+AirKorea_BR = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='백령도')
+AirKorea_BR.date = pd.to_datetime(AirKorea_BR.date)
+AirKorea_BR['date'] = AirKorea_BR['date'].dt.floor('h')
+AirKorea_BR = AirKorea_BR.groupby(pd.Grouper(freq='D', key='date')).mean() # 'D' means daily
+AirKorea_BR = AirKorea_BR.reset_index()
+AirKorea_BR = AirKorea_BR.loc[AirKorea_BR['date'] >= '2019-11-15']
+
+AirKorea_Seoul_monthly = AirKorea_Seoul.groupby(pd.Grouper(freq='m', key='date')).mean()
+AirKorea_Seoul_monthly = AirKorea_Seoul_monthly.reset_index()
+
+AirKorea_GG_monthly = AirKorea_GG.groupby(pd.Grouper(freq='m', key='date')).mean()
+AirKorea_GG_monthly = AirKorea_GG_monthly.reset_index()
+
+AirKorea_BR_monthly = AirKorea_BR.groupby(pd.Grouper(freq='m', key='date')).mean()
+AirKorea_BR_monthly = AirKorea_BR_monthly.reset_index()
+
+df_filter_monthly = df_filter.groupby(pd.Grouper(freq='m', key='date')).mean()
+df_filter_monthly = df_filter_monthly.reset_index()
+df_filter_monthly['PM2.5'] =df_filter_monthly['PM25_filter']
+
+
+target = 'As'
+
+# Daily
+
+plt.figure(figsize=(10,5))
+#plt.plot(AirKorea_Seoul.date, AirKorea_Seoul[target], label='Seoul')
+plt.plot(AirKorea_GG.date, AirKorea_GG[target], label='GG')
+#plt.plot(AirKorea_BR.date, AirKorea_BR[target], label='BR')
+plt.plot(df_filter.date, df_filter[target], label='Siheung')
+plt.legend()
+plt.show()
+
+
+import datetime
+
+# monthly
+
+elements = ['PM2.5', 'SO42-', 'NO3-', 'Cl-', 'Na+', 'NH4+', 'K+', 'Mg2+',
+       'Ca2+', 'OC', 'EC', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Ni',
+       'Cu', 'Zn', 'As', 'Se', 'Br', 'Pb']
+
+for target in elements:
+    plt.figure(figsize=(8,4))
+    plt.plot(AirKorea_Seoul_monthly.date - datetime.timedelta(days=30), AirKorea_Seoul_monthly[target], 'ro-', label='수도권 측정소')
+    plt.plot(AirKorea_GG_monthly.date - datetime.timedelta(days=30), AirKorea_GG_monthly[target], 'o-', label='경기권 측정소')
+    plt.plot(AirKorea_BR_monthly.date - datetime.timedelta(days=30), AirKorea_BR_monthly[target], 'go-', label='백령도 측정소')
+    plt.plot(df_filter_monthly.date - datetime.timedelta(days=30), df_filter_monthly[target], 'bo-', label='시흥시')
+    plt.legend()
+    plt.title(target)
+    plt.ylabel('Concentration ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
+    plt.xlabel('Date (year-month)')
+    plt.xlim([datetime.date(2019,11,1), datetime.date(2021,1,1)])
+    plt.gca().set_ylim(bottom=0)
+    plt.grid(color='gray', alpha=0.5, linestyle='--')
+    plt.savefig('figs\\'+target+'.png')
