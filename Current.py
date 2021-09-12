@@ -95,3 +95,7 @@ data.to_csv('PM25_mean_day.csv', index=False)
 
 
 
+
+
+
+df = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='수도권')

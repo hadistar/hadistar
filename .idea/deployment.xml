@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="student@147.46.92.13:22412" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="Ubuntu_lab">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="student@147.46.92.13:22412">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/student/hadistar" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

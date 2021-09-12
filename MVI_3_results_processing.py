@@ -16,7 +16,6 @@ for i, l in enumerate(list):
         pred_list.append(l)
         pred_cases.append(l.split(sep='_'))
 
-
 pred_cases = pd.DataFrame(pred_cases)
 pred_cases = pred_cases.rename(columns={1:'type', 3:'location', 5:'seed',6:'model',7:'case'})
 
