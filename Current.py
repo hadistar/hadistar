@@ -67,9 +67,6 @@ for i, row in df.iterrows():
 
 data.to_csv('AirKora_2019_2020_SH_100km.csv', encoding='euc-kr')
 
-
-
-
 import pandas as pd
 
 df = pd.read_csv('AirKora_2019_2020_SH_100km.csv')
@@ -78,11 +75,7 @@ df['date'] = pd.to_datetime(df['date'])
 
 df2 = df.groupby(pd.Grouper(freq='Y', key='date'), 'Station code').mean()
 
-
-
 df.loc[df['date']=='2020-06-26'].to_csv('AirKora_2019_2020_SH_100km_20200626.csv')
-
-
 
 df = pd.read_excel('PM2.5_mean_day.xlsx')
 df2 = pd.read_csv('AirKora_2019_2020_SH_100km.csv')
@@ -93,9 +86,5 @@ data = pd.merge(df, df2, how='left', on='Station code')
 
 data.to_csv('PM25_mean_day.csv', index=False)
 
-
-
-
-
-
 df = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='수도권')
+
