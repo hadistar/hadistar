@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import numpy as np
 # Predicted loading
+#test
 
 pred_dir = 'D:\\Dropbox\\패밀리룸\\MVI\\Results\\'
 
