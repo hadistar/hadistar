@@ -601,7 +601,7 @@ Stations.to_csv('SH_APs_locations.csv', index=False)
 
 
 import geopandas
-import contextily as ctx
+#import contextily as ctx
 import pandas as pd
 import math
 import matplotlib.pyplot as plt
@@ -619,21 +619,25 @@ lon1, lon2, lat1, lat2 = 123.0, 131.0, 32.5, 39.5
 extent = [lon1, lon2, lat1, lat2]
 
 
-data2 = pd.read_csv('D:\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_전국_210923.csv')
+data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_전국_210928_2.csv')
 
 
 #data2.columns = ['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
-data2.columns = ['unknown', 'unknown', 'unknown', 'Industry', 'Secondary', 'Mobile','date','Location number','lat','lon']
+data2.columns = ['Salts', 'Industry', 'SN', 'Secondary', 'Soil', 'Traffic','date','Location number','lat','lon']
 
 data2.date = pd.to_datetime(data2.date)
 
-colors = {'Industry':'bone_r','Secondary':'Oranges','Mobile':'Wistia'}
-max_range = {'Industry':1,'Secondary':80,'Mobile':10}
+colors = {'Salts':'Blues', 'Soil':'pink_r', 'SS':'Oranges', 'Coal':'Purples',
+          'Industry':'bone_r', 'Combustions':'Reds', 'SN':'Greens', 'Traffic':'Wistia', 'Secondary':'Reds'}
+
+sources = ['Secondary','Soil','Traffic']
+
+#max_range = {'Industry':1,'Secondary':80,'Mobile':10}
 
 for i in range(len(data2.drop_duplicates('date').date)):
     day = data2.drop_duplicates('date').date[i]
     day = str(day)[:10]
-    for source in ['Secondary','Mobile']:
+    for source in sources:
         data3 = data2[data2['date'] == day]
 
         plt.figure()
@@ -644,8 +648,10 @@ for i in range(len(data2.drop_duplicates('date').date)):
         points = plt.scatter(data3['lon'], data3['lat'], c=data3[source],
         #                     vmin=0, vmax=30,
         #                     vmin=0, vmax=math.ceil(df_z.max()) + 5 - math.ceil(df_z.max()) % 5,
-                             cmap='jet', alpha=0.7, s=0.2,
-                             vmin=0, vmax=max_range[source])
+                             cmap=colors[source],
+                             alpha=0.6,
+                             s=0.7,
+                             vmin=0, vmax=data2[source].max()/1.2)
         cb = plt.colorbar(points, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
 
         cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
@@ -654,10 +660,84 @@ for i in range(len(data2.drop_duplicates('date').date)):
 
         ax.set_xlim(lon1, lon2)
         ax.set_ylim(lat1, lat2)
-        plt.savefig('D:\\OneDrive - SNU\\바탕 화면\\mappingresults_210916\\'+day+', '+source+'.png')
+        plt.savefig('D:\\OneDrive - SNU\\바탕 화면\\mappingresults\\'+day+', '+source+'.png')
         plt.close()
 
 
 
 
 
+
+# 2021-09-29 BNFA results Interpolation by sources (24 APs)
+
+
+import geopandas
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import griddata
+
+plt.rc('font', family='Malgun Gothic')
+plt.rcParams['font.size'] = 20
+
+df1 = geopandas.read_file('D:\\OneDrive - SNU\\QGIS\\SIG_202101\\TL_SCCO_SIG.shp')
+df1 = df1.to_crs(epsg=4326)
+
+df2 = geopandas.read_file('D:\\OneDrive - SNU\\QGIS\\SH.shp')
+df2 = df2.to_crs(epsg=4326)
+
+lon1, lon2, lat1, lat2 = 126.60, 126.95, 37.2, 37.51
+extent = [lon1, lon2, lat1, lat2]
+
+
+for source_number in range(1,9):
+
+    # Contribution data: date by locations
+    data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\BNFA_24sites_PM25_210929_yslee_source_'
+                        +str(source_number)+'.csv', header=None).T
+    locations = pd.read_csv('D:\\Dropbox\\Bayesian modeling\\Young Su Lee\\SH_APs_locations_yslee_210903.csv')
+
+
+    data2['No.'] = [x for x in range(1,25)]
+    data2 = pd.merge(data2, locations, on='No.', how='inner')
+
+    date = pd.read_csv('D:\\Dropbox\\Bayesian modeling\\Young Su Lee\\SH_AP_PM25_kNN_yslee_210910.csv')['date']
+
+    for i, day in enumerate(date):
+
+        plt.figure()
+        ax = df1.plot(figsize=(10, 10), alpha=1.0, edgecolor='k', facecolor='lightgray')
+        points = plt.scatter(data2['lon'], data2['lat'], c=data2[i],
+                             cmap='jet', alpha=0.8, s=100.2)
+        cb = plt.colorbar(points, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
+        cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
+        cb.ax.tick_params(labelsize=20)
+        for i in range(data2.shape[0]):
+            x = data2['lon'][i]
+            y = data2['lat'][i]
+            plt.text(x * 1.00000, y * 0.9998, data2['No.'][i], color='red', fontsize=12)
+
+
+        # Interpolation for contour mapping
+        x, y, z = data2['lon'], data2['lat'], data2[i]
+        xi = np.arange(lon1, lon2, 0.01)
+        yi = np.arange(lat1, lat2, 0.01)
+        xi,yi = np.meshgrid(xi,yi)
+        zi = griddata((x,y),z,(xi,yi),method='linear') # linear, cubic, nearest
+
+        levels = np.linspace(0,z.max(),7)
+        levels = np.round_(levels,2)
+
+        mapping = plt.contourf(xi,yi,zi, cmap='jet', alpha=0.8)
+        cb = plt.colorbar(mapping, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
+        #cb.set_label(label='WPSCF', size=20)
+        cb.ax.tick_params(labelsize=15)
+        plt.title('['+day+', '+'source 1'+']')
+
+        ax.set_xlim(lon1, lon2)
+        ax.set_ylim(lat1, lat2)
+        plt.savefig('D:\\OneDrive - SNU\\바탕 화면\\mappingresults\\BNFA_PM25_source_'+str(source_number)+day+'_yslee.png')
+        plt.show()
+        plt.close()
+
+# End of BNFA contour mapping
