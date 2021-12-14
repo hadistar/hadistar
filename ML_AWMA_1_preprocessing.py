@@ -8,10 +8,17 @@ Seoul.date = pd.to_datetime(Seoul.date)
 MDLs = {'S':0.8, 'K':0.16, 'Ca':0.02, 'Ti':0.012, 'V':0.004, 'Cr':0.002, 'Mn':0.0012, 'Fe':0.0012, 'Ni':0.0008,
        'Cu':0.0008, 'Zn':0.0004, 'As':0.0004, 'Se':0.0012, 'Br':0.0016, 'Pb':0.0012}
 
+# 기간별 자르기
+
 df = Seoul[Seoul.date>'2016-01-01']
 df = df[:-1]
 
+
+#-----------------------------------------------
+# 번외: For EDA
+
 from pandas_profiling import ProfileReport
+
 
 # EDA Report 생성
 profile = ProfileReport(df,
@@ -25,13 +32,15 @@ profile = ProfileReport(df,
 # Report 결과 경로에 저장
 profile.to_file(output_file="data_profiling.html")
 
+#-----------------------------------------------
 
-# Ratio of values below MDLs
+# Ratio calculation of values below MDLs
 
 for species in MDLs.keys():
     temp = df[df[species]<MDLs[species]].count()[species]
-    print(species, round(temp/43848*100,2),"%")
+    print(species, round(temp/len(df)*100,2),"%")
 
+#-------------------------------------------------
 # Histogram
 
 import matplotlib.pyplot as plt
@@ -40,13 +49,14 @@ plt.figure(figsize=(12,4))
 plt.hist(df['Cr'], bins=200, range=[0,0.004])
 plt.show()
 
+#--------------------------------------------------
+
 # Missing ratio calculation
 
-print(round(df.isna().sum()/43848*100,2),"%")
+print(round(df.isna().sum()/len(df)*100,2),"%")
 
+#--------------------------------------------------
 
-df = Seoul[Seoul.date>'2016-01-01']
-df = df[:-1]
 
 # MDL 이하값 MDLs*2로 대체..
 
