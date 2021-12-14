@@ -25,9 +25,10 @@ elementals = ['S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Ni', 'Cu', 'Zn', 'As
 elements = [ions,ocec,elementals, ions+ocec, ions+elementals, ocec+elementals,ions+ocec+elementals]
 elements_name = ['ions', 'ocec','elementals','ion-ocec','ion-elementals','ocec-elementals','ions-ocec-elementals']
 
-seeds = [322]
-#elements = [ions+ocec+elementals]
-#elements_name = ['ions-ocec-elementals']
+
+seeds = [777]
+elements = [ions+elementals, ocec+elementals,ions+ocec+elementals]
+elements_name = ['ion-elementals','ocec-elementals','ions-ocec-elementals']
 
 iteration = 1
 
@@ -35,7 +36,7 @@ for s in range(len(seeds)):
     for ele in range(len(elements)):
         for iter in range(iteration):
 
-            name = case + '_result_'+ str(seeds[s])+'_RF2_'+str(elements_name[ele])+'_'+str(iter+1)
+            name = case + '_result_'+ str(seeds[s])+'_RF_'+str(elements_name[ele])+'_missing rate_'+str(int(missing_ratio*10))+'_'+str(iter+1)
 
             eraser = df.sample(int(len(df)*0.2), random_state=seeds[s]).index
             target = elements[ele]
@@ -125,4 +126,6 @@ for s in range(len(seeds)):
                 y_predicted_total[c] = y_predicted_total[c] * scalingfactor[c][0] + scalingfactor[c][1]
 
             y_predicted_total.to_csv(name + '.csv', index=False)
+
+
 

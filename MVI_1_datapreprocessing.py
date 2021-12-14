@@ -8,6 +8,10 @@ Seoul.date = pd.to_datetime(Seoul.date)
 df = Seoul[Seoul.date>'2018-01-01'].dropna()
 df.to_csv('1_Basic_Seoul_raw.csv', index=False)
 
+round(df.isnull().sum()/len(df)*100, 2).to_clipboard()
+(df.dropna().mean()*1000).to_clipboard()
+
+
 df.sample(int(len(df)*0.2), random_state=777)
 
 

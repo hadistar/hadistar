@@ -150,9 +150,7 @@ for i in range(len(data2.drop_duplicates('date').date)):
 # 2021-09-13 스마트시티 베이지안 매핑 - BSMRM - Monotone version
 
 import geopandas
-import contextily as ctx
 import pandas as pd
-import math
 import matplotlib.pyplot as plt
 
 
@@ -172,20 +170,28 @@ extent = [lon1, lon2, lat1, lat2]
 
 #data2 = pd.read_csv('D:\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_BSMRM_210913.csv')
 #data2 = pd.read_csv('D:\\OneDrive - SNU\\바탕 화면\\results_BSMRM_210913.csv')
-data2 = pd.read_csv('D:\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_BSMRM_210923_w24_sigma05.csv')
+data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_BSMRM_w24APs_N3_elementwise_211005.csv')
 
 #data2 = pd.read_csv('D:\\OneDrive - SNU\\바탕 화면\\Smartcity_Sampledata\\매핑결과_샘플.csv', encoding='euc-kr')
 #data2 = pd.read_csv('D:\\OneDrive - SNU\\바탕 화면\\Smartcity_Sampledata\\results.csv', encoding='euc-kr')
 #data2.columns = ['해염 입자','석탄 연소','기타 연소','산업 배출','토양','2차 질산염','2차 황산염','자동차','date','Location number','lat','lon']
 
-data2.columns = ['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
+#data2.columns = ['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
+data2.columns = ['Salts',	'Soil', 'SS', 'Coal', 'biomass', 'indus_smel', 'indus_oil', 'heating', 'SN', 'traffic','date','Location number','lat','lon']
+
+data2 = data2[['Salts',	'Soil', 'SS', 'Coal','indus_smel',  'heating', 'SN', 'traffic','date','Location number','lat','lon']]
+data2. columns =['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
 colors = {'Salts':'Blues', 'Soil':'pink_r', 'SS':'Oranges', 'Coal':'Purples',
           'Industry':'bone_r', 'Combustions':'Reds', 'SN':'Greens', 'Traffic':'Wistia'}
+
+vmaxs = {'Salts':1.5, 'Soil':0.1, 'SS':5.1, 'Coal':1.0,
+          'Industry':9.5, 'Combustions':3.5, 'SN':5.2, 'Traffic':5.2}
+
 data2.date = pd.to_datetime(data2.date)
 
 for i in range(len(data2.drop_duplicates('date').date)):
 
-    if i % 20 ==0:
+    if i%10==0:
 
         day = data2.drop_duplicates('date').date[i]
         day = str(day)[:10]
@@ -199,9 +205,9 @@ for i in range(len(data2.drop_duplicates('date').date)):
             #          linestyle='None', markersize=0.15, label='Monitoring Site')
 
             points = plt.scatter(data3['lon'], data3['lat'], c=data3[source],
-            #                     vmin=0, vmax=30,
-            #                     vmin=0, vmax=math.ceil(df_z.max()) + 5 - math.ceil(df_z.max()) % 5,
-                                 cmap=colors[source], alpha=0.85, s=0.2)
+                                 vmin=0, vmax=data2[source].max()*0.8, #vmaxs[source],
+                                 cmap=colors[source], alpha=0.75, s=0.2)
+                                 #cmap = 'jet', alpha = 0.75, s = 0.2)
             cb = plt.colorbar(points, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
 
             cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
@@ -210,17 +216,71 @@ for i in range(len(data2.drop_duplicates('date').date)):
 
             ax.set_xlim(lon1, lon2)
             ax.set_ylim(lat1, lat2)
-            plt.savefig('D:\\OneDrive - SNU\\바탕 화면\\mappingresults_210923_sigmaK05\\'+day+', '+source+'.png')
+            plt.savefig('D:\\mappingresults\\'+source + '_'+ day+', '+source+'.png')
             plt.close()
 
 
+# location number = 2738
+# SH point result comparison 1:1
+import pandas as pd
+import matplotlib.pyplot as plt
+plt.rcParams['font.family'] = 'Arial'
+plt.rcParams['font.size'] = 13
+plt.rcParams.update({'figure.autolayout': True})
+
+import math
+import numpy as np
+from sklearn import linear_model
+import sklearn
+
+BSMRM_SH = data2.loc[data2['Location number']==2738].copy()
+df_SH = pd.read_csv("D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\Smartcity_BSMRM_3Locations_KNN.csv")
+df_SH = df_SH.loc[df_SH['StationNo']==1].copy()
+
+plt.figure()
+
+x = np.array(df_SH['PM2.5'])
+y = np.array(BSMRM_SH.iloc[:,0:8].sum(1)/100)
+
+# Create linear regression object
+linreg = linear_model.LinearRegression()
+# Fit the linear regression model
+model = linreg.fit(x.reshape(-1,1), y.reshape(-1,1))
+
+
+#model = linreg.fit(x.to_numpy().reshape(-1, 1), y.to_numpy().reshape(-1, 1))
+# Get the intercept and coefficients
+intercept = model.intercept_
+coef = model.coef_
+result = [intercept, coef]
+predicted_y = x.reshape(-1, 1) * coef + intercept
+r_squared = sklearn.metrics.r2_score(y, predicted_y)
+
+plt.figure(figsize=(5,5))
+#plt.scatter(x, y, s=40, facecolors='none', edgecolors='k')
+plt.plot(x, y, 'ro', markersize=8, mfc='none')
+
+plt.plot(x, predicted_y, 'b-', 0.1)
+plt.plot([0,110],[0,110], 'k--')
+#plt.plot([0,math.ceil(max(x.max(),y.max()))],[0,math.ceil(max(x.max(),y.max()))], 'k--')
+plt.xlabel('Concentration of sampled filter ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
+plt.ylabel('Concentration of BSMRM ('+ "${\mu}$" +'g/m' + r'$^3$' + ')')
+plt.text(x.max() * 0.1, y.max() * 0.6,
+         'y = %0.2fx + %0.2f\n$r^2$ = %0.2f (n=%s)'
+         % (coef, intercept, r_squared, format(len(x), ',')))
+#plt.axis([0, math.ceil(max(x.max(),y.max())), 0, math.ceil(max(x.max(),y.max()))])
+plt.axis([0, 110,0,110])
+plt.grid(True, linestyle='--')
+#plt.legend(loc='upper left')
+plt.tight_layout()
+plt.show()
 
 
 
 # 2021-09-13 스마트시티 베이지안 매핑 - BNFA
 
 import geopandas
-import contextily as ctx
+
 import pandas as pd
 import math
 import matplotlib.pyplot as plt
@@ -237,7 +297,7 @@ df2 = df2.to_crs(epsg=4326)
 lon1, lon2, lat1, lat2 = 126.60, 126.95, 37.2, 37.51
 extent = [lon1, lon2, lat1, lat2]
 
-data2 = pd.read_csv('D:\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\BNFA_24sites_PM25_210914_yslee.csv', header=None).T
+data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\BNFA_24sites_PM25_211005_yslee.csv', header=None).T
 q = data2.shape[1]
 locations = pd.read_csv('D:\\Dropbox\\Bayesian modeling\\Young Su Lee\\SH_APs_locations_yslee_210903.csv')
 
@@ -273,7 +333,7 @@ for source in range(q):
 
 
 import geopandas
-import contextily as ctx
+
 import pandas as pd
 import math
 import matplotlib.pyplot as plt
@@ -292,12 +352,12 @@ df2 = df2.to_crs(epsg=4326)
 lon1, lon2, lat1, lat2 = 126.60, 126.95, 37.2, 37.51
 extent = [lon1, lon2, lat1, lat2]
 
-data2 = pd.read_csv('D:\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\BNFA_24sites_CO_210914_yslee.csv', header=None).T
+data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\BNFA_24sites_PM25_211005_yslee.csv', header=None).T
 q = data2.shape[1]
 locations = pd.read_csv('D:\\Dropbox\\Bayesian modeling\\Young Su Lee\\SH_APs_locations_yslee_210903.csv')
 
 data2['No.'] = [x for x in range(1,25)]
-data2['No.'] = [x for x in range(1,25) if x !=3]
+
 data2 = pd.merge(data2, locations, on='No.', how='inner')
 
 for source in range(q):
@@ -329,11 +389,11 @@ for source in range(q):
     cb = plt.colorbar(mapping, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
     #cb.set_label(label='WPSCF', size=20)
     cb.ax.tick_params(labelsize=15)
-    plt.title('[CO, source '+str(source+1)+']')
+    plt.title('[PM25, source '+str(source+1)+']')
 
     ax.set_xlim(lon1, lon2)
     ax.set_ylim(lat1, lat2)
-    plt.savefig('D:\\OneDrive - SNU\\바탕 화면\\BNFA_CO_source ' + str(source+1) +'_yslee_210914.png')
+    plt.savefig('D:\\mappingresults\\BNFA_PM25_source ' + str(source+1) +'_yslee_211005.png')
     plt.show()
     plt.close()
 
@@ -707,15 +767,15 @@ for source_number in range(1,9):
 
         plt.figure()
         ax = df1.plot(figsize=(10, 10), alpha=1.0, edgecolor='k', facecolor='lightgray')
-        points = plt.scatter(data2['lon'], data2['lat'], c=data2[i],
-                             cmap='jet', alpha=0.8, s=100.2)
-        cb = plt.colorbar(points, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
-        cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
-        cb.ax.tick_params(labelsize=20)
-        for i in range(data2.shape[0]):
-            x = data2['lon'][i]
-            y = data2['lat'][i]
-            plt.text(x * 1.00000, y * 0.9998, data2['No.'][i], color='red', fontsize=12)
+        #points = plt.scatter(data2['lon'], data2['lat'], c=data2[i],
+        #                     cmap='jet', alpha=0.8, s=100.2)
+        #cb = plt.colorbar(points, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
+        #cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
+        #cb.ax.tick_params(labelsize=20)
+        #for i in range(data2.shape[0]):
+        #    x = data2['lon'][i]
+        #    y = data2['lat'][i]
+        #    plt.text(x * 1.00000, y * 0.9998, data2['No.'][i], color='red', fontsize=12)
 
 
         # Interpolation for contour mapping
@@ -732,12 +792,65 @@ for source_number in range(1,9):
         cb = plt.colorbar(mapping, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
         #cb.set_label(label='WPSCF', size=20)
         cb.ax.tick_params(labelsize=15)
-        plt.title('['+day+', '+'source 1'+']')
+        plt.title('['+day+', '+'source '+str(source_number)+']')
 
         ax.set_xlim(lon1, lon2)
         ax.set_ylim(lat1, lat2)
         plt.savefig('D:\\OneDrive - SNU\\바탕 화면\\mappingresults\\BNFA_PM25_source_'+str(source_number)+day+'_yslee.png')
-        plt.show()
         plt.close()
 
 # End of BNFA contour mapping
+
+
+
+
+# For Bayesian, w mapping_전국
+
+import geopandas
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+plt.rc('font', family='Malgun Gothic')
+plt.rcParams['font.size'] = 20
+
+
+df1 = geopandas.read_file('D:\\OneDrive - SNU\\QGIS\\SIG_202101\\TL_SCCO_SIG.shp')
+df1 = df1.to_crs(epsg=4326)
+
+df2 = geopandas.read_file('D:\\OneDrive - SNU\\QGIS\\SH.shp')
+df2 = df2.to_crs(epsg=4326)
+
+lon1, lon2, lat1, lat2 = 124.0, 130.2, 32.8, 39.00
+extent = [lon1, lon2, lat1, lat2]
+
+w=pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\w25_전국.csv')
+
+N = pd.read_csv('data\\Smartcity_Bayesian_Locations.csv')
+N = N.iloc[:-1,2:4]
+
+plt.figure()
+ax = df1.plot(figsize=(10, 10), alpha=1.0, edgecolor='k', facecolor='lightgray')
+#ctx.add_basemap(ax, zoom=13, crs='epsg:4326')
+# plt.plot(w[1], w[0], color='blue', marker='X',
+#          linestyle='None', markersize=10, label='w9')
+
+for i in range(len(w)):
+    y = w.iloc[i][0] # lat
+    x = w.iloc[i][1] # lon
+
+    plt.text(x*1.00000, y*0.9998, i+1, color='red',fontsize=14)
+
+plt.plot(w['lon'], w['lat'], color='blue', marker='X', linestyle='None',
+         markersize=15.15, label='Underlying location')
+
+plt.plot(N['lon'], N['lat'], color='red', marker='o',
+         linestyle='None', markersize=10, label='Monitoring site')
+plt.plot(126.739900, 37.347200, color='red', marker='o',
+         linestyle='None', markersize=10)
+
+ax.set_xlim(lon1, lon2)
+ax.set_ylim(lat1, lat2)
+plt.legend()
+plt.show()
+
