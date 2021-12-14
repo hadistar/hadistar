@@ -13,7 +13,6 @@ MDLs = {'S':0.8, 'K':0.16, 'Ca':0.02, 'Ti':0.012, 'V':0.004, 'Cr':0.002, 'Mn':0.
 df = Seoul[Seoul.date>'2016-01-01']
 df = df[:-1]
 
-
 #-----------------------------------------------
 # 번외: For EDA
 
@@ -67,9 +66,60 @@ for species in MDLs.keys():
     df[species].loc[df[species]<MDLs[species]] = MDLs[species] * 0.5
 
 # Ions & carbons
+df = df.reset_index(drop=True).copy()
 
-MDLs_2 = pd.read_excel('data\\Intensiv_Seoul_MDLs_ions_carbons_2018-19.xlsx')
-MDLs_2.date = pd.to_datetime(Seoul.date)
+MDLs = pd.read_excel('data\\Intensiv_Seoul_MDLs_2018-19.xlsx')
+MDLs.date = pd.to_datetime(MDLs.date)
+
+temp = df.copy()
+
+columns = ['SO42-', 'NO3-', 'Cl-', 'Na+', 'NH4+', 'K+', 'Mg2+',
+           'Ca2+', 'OC', 'EC', 'S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Ni',
+           'Cu', 'Zn', 'As', 'Se', 'Br', 'Pb']
+
+# MDL 이하값 비율 계산용
+
+def calcul_mdls_ratio(row):
+
+    MDL = MDLs.loc[(MDLs.date.dt.year == row.date.year) & (MDLs.date.dt.month == row.date.month)]
+    temp = row
+    for col in columns:
+        if row.loc[col] < MDL.iloc[0][col]:
+            temp.loc[col] = 1
+        elif row.loc[col] >= MDL.iloc[0][col]:
+            temp.loc[col] = 0
+
+    return temp
+
+df3_MDL_bool =  df.apply(calcul_mdls_ratio, axis=1)
+
+# 비율 체크
+
+for species in df3_MDL_bool.columns:
+    temp = df3_MDL_bool[df3_MDL_bool[species]==1].count()[species]
+    print(species, round(temp/len(df)*100,2),"%")
+
+#-------------------------------------------------------
+
+# MDL 이하값 MDL*0.5 대체용
 
 def calcul_mdls(row):
 
+    MDL = MDLs.loc[(MDLs.date.dt.year == row.date.year) & (MDLs.date.dt.month == row.date.month)]
+    temp = row
+    for col in columns:
+        if row.loc[col] < MDL.iloc[0][col]:
+            temp.loc[col] = MDL.iloc[0][col]*0.5
+
+    return temp
+
+df2 = df.apply(calcul_mdls, axis=1)
+
+# Missing ratio calculation
+
+print(round(df2.isna().sum()/len(df2)*100,2),"%")
+
+# df3: drop na values
+
+df3 = df2.dropna()
+df3.to_csv('AWMA_input_preprocessed_MDL_Na.csv', index=False)
