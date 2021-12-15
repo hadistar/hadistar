@@ -210,8 +210,6 @@ import geopandas
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-
 plt.rc('font', family='Malgun Gothic')
 plt.rcParams['font.size'] = 20
 
@@ -225,13 +223,16 @@ df2 = df2.to_crs(epsg=4326)
 lon1, lon2, lat1, lat2 = 126.65, 126.9, 37.3, 37.5
 extent = [lon1, lon2, lat1, lat2]
 
-spatial_results = pd.read_csv('BNFA_PMF_results_for_mapping_211006_yslee.csv')
+# spatial_results = pd.read_csv('BNFA_PMF_results_for_mapping_211006_yslee.csv')
+# spatial_results['산업 배출'] = spatial_results['indus_smel'] + spatial_results['indus_oil']
+# spatial_results['기타 연소'] = spatial_results['biomass'] + spatial_results['heating']
+# spatial_results = spatial_results.rename(columns={'Salts':'해염 입자','Soil':'토양','SS':'2차 황산염','Coal':'석탄 연소','SN':'2차 질산염','traffic':'자동차'})
 
-spatial_results['산업 배출'] = spatial_results['indus_smel'] + spatial_results['indus_oil']
-spatial_results['기타 연소'] = spatial_results['biomass'] + spatial_results['heating']
-spatial_results = spatial_results.rename(columns={'Salts':'해염 입자','Soil':'토양','SS':'2차 황산염','Coal':'석탄 연소','SN':'2차 질산염','traffic':'자동차'})
 
-spatial_results = spatial_results[['date','location No.','lat','lon','해염 입자','석탄 연소','기타 연소','산업 배출','토양','2차 질산염','2차 황산염','자동차']]
+spatial_results = pd.read_csv('스마트시티_매핑결과_서울대_raw_좌표재설정_211215.csv', encoding='euc-kr')
+spatial_results = spatial_results.rename(columns={"spot_lon":'lon', 'spot_lat':'lat'})
+
+#spatial_results = spatial_results[['date','location No.','lat','lon','해염 입자','석탄 연소','기타 연소','산업 배출','토양','2차 질산염','2차 황산염','자동차']]
 
 colors = {'해염 입자':'Blues', '토양':'pink_r', '2차 황산염':'Oranges', '석탄 연소':'Purples',
           '산업 배출':'bone_r', '기타 연소':'Reds', '2차 질산염':'Greens', '자동차':'Wistia'}
@@ -280,10 +281,10 @@ for i in range(len(spatial_results.drop_duplicates('date').date)):
         ax.set_ylim(lat1, lat2)
         plt.tight_layout()
 
-        plt.savefig('D:\\mappingresults\\PM25_total_' + day + '.png')
+        plt.savefig('D:\\mappingresults\\' + day + '_PM25_total'+'.png')
+        plt.savefig('D:\\mappingresults\\' + day + '_PM25_total'+'.svg')
+
         plt.close('all')
-
-
 
         # mapping by source
         for source in sources:
@@ -321,7 +322,9 @@ for i in range(len(spatial_results.drop_duplicates('date').date)):
             ax.set_ylim(lat1, lat2)
             plt.tight_layout()
 
-            plt.savefig('D:\\mappingresults\\'+source + '_'+ day+'.png')
+            plt.savefig('D:\\mappingresults\\'+day+'_'+source +'.png')
+            plt.savefig('D:\\mappingresults\\'+day+'_'+source +'.svg')
+
             plt.close('all')
 
 

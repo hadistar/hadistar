@@ -316,3 +316,51 @@ plt.figure()
 df.boxplot(column=["NO3-"], by=['StationNo'])
 plt.show()
 plt.close()
+
+
+
+import pandas as pd
+
+df = pd.read_csv("D:\OneDrive - SNU\바탕 화면\등농도맵핑 샘플 데이터.csv")
+
+locs = df.drop_duplicates(['spot_lat', 'spot_lon'])
+
+SNU = pd.read_csv('스마트시티_매핑결과_서울대_raw_2.csv').drop_duplicates(['lat','lon'])
+
+df1 = pd.DataFrame(locs)
+df2 = pd.DataFrame(SNU)
+
+df1['point'] = [(x, y) for x,y in zip(df1['spot_lat'], df1['spot_lon'])]
+df2['point'] = [(x, y) for x,y in zip(df2['lat'], df2['lon'])]
+
+def closest_point(point, points):
+    """ Find closest point from a list of points. """
+    return points[cdist([point], points).argmin()]
+
+def match_value(df, col1, x, col2):
+    """ Match value x from col1 row to value in col2. """
+    return df[df[col1] == x][col2].values[0]
+
+from scipy.spatial.distance import cdist
+
+df1['closest'] = [closest_point(x, list(df2['point'])) for x in df1['point']]
+
+df1['location No.'] = [match_value(df2, 'point', x, 'location No.') for x in df1['closest']]
+
+df = pd.read_csv('스마트시티_매핑결과_서울대_raw_2.csv')
+
+dates = df.date.drop_duplicates()
+
+ans = pd.DataFrame()
+for d in dates:
+    temp = df.loc[df['date']==d]
+    temp2 = pd.merge(df1, temp, how='inner', on='location No.')
+    ans = ans.append(temp2)
+
+final = ans[['spot_cd', 'spot_lat', 'spot_lon', 'date', '해염 입자', '석탄 연소', '기타 연소',
+       '산업 배출', '토양', '2차 질산염', '2차 황산염', '자동차']].copy()
+
+
+final.to_csv('스마트시티_매핑결과_서울대_raw_좌표재설정_211215.csv', index=False, encoding='euc-kr')
+
+

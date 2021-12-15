@@ -1,3 +1,7 @@
+
+# 2021-12-14
+# MDL값 처리
+
 import pandas as pd
 
 Seoul = pd.read_excel('data\\집중측정소_to2020_hourly.xlsx', sheet_name='수도권')
@@ -119,7 +123,133 @@ df2 = df.apply(calcul_mdls, axis=1)
 
 print(round(df2.isna().sum()/len(df2)*100,2),"%")
 
+
+df2.to_csv('AWMA_input_preprocessed_MDL_withNa.csv', index=False)
+
 # df3: drop na values
 
-df3 = df2.dropna()
-df3.to_csv('AWMA_input_preprocessed_MDL_Na.csv', index=False)
+# df3 = df2.dropna()
+# df3.to_csv('AWMA_input_preprocessed_MDL_Na.csv', index=False)
+
+
+#-----------------------------------------------------------------------
+# 2021-12-15
+# Input 자료에 기상, 대기오염 자료 붙이기
+
+import pandas as pd
+import numpy as np
+
+
+# 1. AirKorea 자료 붙이기
+
+# 1-1. 집중측정소와 가장 가까운 AirKorea Station 찾기
+
+stations = pd.read_csv("D:\\OneDrive - SNU\\data\\AirKorea\\AirKorea_20191103_전국.csv", encoding='euc-kr')
+locations = pd.read_excel('D:\\Dropbox\\패밀리룸\\MVI\\Data\\pm25speciation_locations_KoreaNational.xlsx')
+
+Nearstations = []
+
+for loc in ['Seoul']:
+    distance = []
+    temp = locations.loc[locations['location']==loc]
+
+    for i in stations.index:
+        temp_dist = (temp.lat-stations.iloc[i].Latitude)**2+(temp.lon-stations.iloc[i].Longitude)**2
+        distance.append(float(temp_dist))
+
+    Nearstations.append(stations.iloc[np.argmin(distance)]['측정소코드'])
+
+import os
+
+# 1-2. 해당 지점의 AirKorea 자료 불러오기
+
+AirKorea_2018_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2018')
+AirKorea_2019_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2019')
+AirKorea_2020_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2020')
+
+AirKorea_2018 = pd.DataFrame()
+AirKorea_2019 = pd.DataFrame()
+AirKorea_2020 = pd.DataFrame()
+
+Seoul = pd.DataFrame()
+
+for i in range(len(AirKorea_2018_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2018\\'+AirKorea_2018_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2019_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2019\\'+AirKorea_2019_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2020_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2020\\'+AirKorea_2020_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+
+# 1-3. 시간 형식 통일시키기
+# 시간 기준으로 합치기 위해 시간 형식으로 자료 변환
+
+Seoul['temp'] = Seoul['측정일시'] - 1
+Seoul['date'] = pd.to_datetime(Seoul['temp'], format='%Y%m%d%H')
+Seoul['date'] = Seoul['date'] + pd.DateOffset(hours=1)
+
+# 1-4. 쓸 자료만 추리기
+Seoul = Seoul[['date','PM25','PM10','SO2','CO','O3','NO2']]
+
+
+# 1-5. 기존 자료와 합치기
+
+df = pd.read_csv('AWMA_input_preprocessed_MDL_withNa.csv')
+df['date'] = pd.to_datetime(df['date'])
+df = df[df.date>'2018-01-01']
+
+## 이상하게 붙은 초 단위 시간 지우기
+df['date'] = df['date'] - pd.to_timedelta(df['date'].dt.second, unit='s')
+df['date'] = df['date'].dt.floor('h')
+
+# 합치기
+df2 = pd.merge(df, Seoul, how='inner',on='date')
+
+# 저장
+df2.to_csv('AWMA_input_preprocessed_MDL_AirKorea_withNa.csv', index=False)
+
+del Seoul
+
+# 2. 기상자료 붙이기
+
+# 2-1. 기상자료 불러오기, 서울 AWOS 지점코드 108
+Meteo_Seoul_2018 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2018_2018_2019.csv", encoding='euc-kr')
+Meteo_Seoul_2019 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2019_2019_2020.csv", encoding='euc-kr')
+Meteo_Seoul_2020 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2020_2020_2021.csv", encoding='euc-kr')
+
+Meteo_Seoul = Meteo_Seoul_2018.append(Meteo_Seoul_2019).append(Meteo_Seoul_2020)
+
+Meteo_Seoul = Meteo_Seoul.loc[:,['일시', '기온(°C)', '강수량(mm)', '풍속(m/s)', '풍향(16방위)', '습도(%)', '증기압(hPa)',
+                                 '이슬점온도(°C)', '현지기압(hPa)', '일조(hr)', '일사(MJ/m2)', '적설(cm)',
+                                 '전운량(10분위)', '시정(10m)', '지면온도(°C)', '30cm 지중온도(°C)']]
+Meteo_Seoul.columns = ['date','temp','rainfall','ws','wd','RH','vapor',
+                       'dewpoint','pressure','sunshine','insolation','snow',
+                       'cloud','visibility','groundtemp','30cmtemp']
+Meteo_Seoul.isna().sum()
+Meteo_Seoul[['rainfall','sunshine','insolation','snow']] = Meteo_Seoul[['rainfall','sunshine','insolation','snow']].fillna(0)
+Meteo_Seoul.isna().sum()
+
+# 불필요한 변수 삭제
+del Meteo_Seoul_2018, Meteo_Seoul_2019, Meteo_Seoul_2020
+
+# 시간 기준으로 합치기 위해 시간 형식으로 자료 변환
+df2.date = pd.to_datetime(df2.date)
+Meteo_Seoul.date = pd.to_datetime(Meteo_Seoul.date)
+
+# 합치기
+
+df3 = pd.merge(df2, Meteo_Seoul, how='inner',on='date')
+
+# 저장
+
+df3.to_csv('AWMA_input_preprocessed_MDL_AirKorea_Meteo_2018_2020_withNa.csv', index=False)
+
+# 결측비율 체크
+
+print(df3.isna().sum()/len(df3)*100)
+

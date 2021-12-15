@@ -148,11 +148,12 @@ for i in range(len(data2.drop_duplicates('date').date)):
 
 # 2021-08-25 스마트시티 베이지안 매핑용 연습
 # 2021-09-13 스마트시티 베이지안 매핑 - BSMRM - Monotone version
+# 2021-12-15 스마트시티 베이지안 매핑 좌표 재설정
 
 import geopandas
 import pandas as pd
 import matplotlib.pyplot as plt
-
+from scalebar import scale_bar
 
 plt.rc('font', family='Malgun Gothic')
 plt.rcParams['font.size'] = 20
@@ -170,32 +171,41 @@ extent = [lon1, lon2, lat1, lat2]
 
 #data2 = pd.read_csv('D:\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_BSMRM_210913.csv')
 #data2 = pd.read_csv('D:\\OneDrive - SNU\\바탕 화면\\results_BSMRM_210913.csv')
-data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_BSMRM_w24APs_N3_elementwise_211005.csv')
+#data2 = pd.read_csv('D:\\Dropbox\\hadistar\\Matlab\\Smartcity_BSMRM_202108\\results_BSMRM_w24APs_N3_elementwise_211005.csv')
+data2 = pd.read_csv('스마트시티_매핑결과_서울대_raw_좌표재설정_211215.csv', encoding='euc-kr')
 
 #data2 = pd.read_csv('D:\\OneDrive - SNU\\바탕 화면\\Smartcity_Sampledata\\매핑결과_샘플.csv', encoding='euc-kr')
 #data2 = pd.read_csv('D:\\OneDrive - SNU\\바탕 화면\\Smartcity_Sampledata\\results.csv', encoding='euc-kr')
 #data2.columns = ['해염 입자','석탄 연소','기타 연소','산업 배출','토양','2차 질산염','2차 황산염','자동차','date','Location number','lat','lon']
 
 #data2.columns = ['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
-data2.columns = ['Salts',	'Soil', 'SS', 'Coal', 'biomass', 'indus_smel', 'indus_oil', 'heating', 'SN', 'traffic','date','Location number','lat','lon']
+#data2.columns = ['Salts',	'Soil', 'SS', 'Coal', 'biomass', 'indus_smel', 'indus_oil', 'heating', 'SN', 'traffic','date','Location number','lat','lon']
 
-data2 = data2[['Salts',	'Soil', 'SS', 'Coal','indus_smel',  'heating', 'SN', 'traffic','date','Location number','lat','lon']]
-data2. columns =['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
+#data2 = data2[['Salts',	'Soil', 'SS', 'Coal','indus_smel',  'heating', 'SN', 'traffic','date','Location number','lat','lon']]
+#data2. columns =['Salts', 'Soil', 'SS', 'Coal', 'Industry', 'Combustions', 'SN', 'Traffic','date','Location number','lat','lon']
 colors = {'Salts':'Blues', 'Soil':'pink_r', 'SS':'Oranges', 'Coal':'Purples',
           'Industry':'bone_r', 'Combustions':'Reds', 'SN':'Greens', 'Traffic':'Wistia'}
 
 vmaxs = {'Salts':1.5, 'Soil':0.1, 'SS':5.1, 'Coal':1.0,
           'Industry':9.5, 'Combustions':3.5, 'SN':5.2, 'Traffic':5.2}
 
+
+colors = {'해염 입자':'Blues', '토양':'pink_r', '2차 황산염':'Oranges', '석탄 연소':'Purples',
+          '산업 배출':'bone_r', '기타 연소':'Reds', '2차 질산염':'Greens', '자동차':'Wistia'}
+
+vmaxs = {'해염 입자':3, '토양':2, '2차 황산염':20, '석탄 연소':3,
+          '산업 배출':7, '기타 연소':20, '2차 질산염':30, '자동차':20}
+
 data2.date = pd.to_datetime(data2.date)
 
-for i in range(len(data2.drop_duplicates('date').date)):
+#for i in range(len(data2.drop_duplicates('date').date)):
+for day in data2.drop_duplicates('date').date:
 
-    if i%10==0:
+    if True:
 
-        day = data2.drop_duplicates('date').date[i]
+#        day = data2.drop_duplicates('date').date[i]
         day = str(day)[:10]
-        for source in data2.columns[:8]:
+        for source in data2.columns[4:]:
             data3 = data2[data2['date'] == day]
 
             plt.figure()
@@ -204,22 +214,35 @@ for i in range(len(data2.drop_duplicates('date').date)):
             # plt.plot(data['lon'], data['lat'], color='blue', marker='X',
             #          linestyle='None', markersize=0.15, label='Monitoring Site')
 
-            points = plt.scatter(data3['lon'], data3['lat'], c=data3[source],
-                                 vmin=0, vmax=data2[source].max()*0.8, #vmaxs[source],
+            points = plt.scatter(data3['spot_lon'], data3['spot_lat'], c=data3[source],
+                                 vmin=0, vmax=vmaxs[source], #vmax=data2[source].max()*0.8,
                                  cmap=colors[source], alpha=0.75, s=0.2)
                                  #cmap = 'jet', alpha = 0.75, s = 0.2)
             cb = plt.colorbar(points, orientation='vertical', ticklocation='auto', shrink=0.5, pad=0.1)
 
+            x, y, arrow_length = 0.9, 0.9, 0.1
+            ax.annotate('N', xy=(x, y), xytext=(x, y - arrow_length),
+                        arrowprops=dict(facecolor='black', width=5, headwidth=15),
+                        ha='center', va='center', fontsize=20,
+                        xycoords=ax.transAxes)
+
             cb.set_label(label='Concentration (' + "${\mu}$" + 'g/m' + r'$^3$' + ')', size=20)
             cb.ax.tick_params(labelsize=20)
             plt.title('['+day+', '+source+']')
-
             ax.set_xlim(lon1, lon2)
             ax.set_ylim(lat1, lat2)
-            plt.savefig('D:\\mappingresults\\'+source + '_'+ day+', '+source+'.png')
+            plt.savefig('D:\\mappingresults\\'+ day+', '+source+'.png')
+            plt.savefig('D:\\mappingresults\\'+ day+', '+source+'.svg')
             plt.close()
 
 
+
+
+
+
+
+
+#-------------------------------------------------
 # location number = 2738
 # SH point result comparison 1:1
 import pandas as pd
