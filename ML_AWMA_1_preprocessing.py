@@ -123,7 +123,6 @@ df2 = df.apply(calcul_mdls, axis=1)
 
 print(round(df2.isna().sum()/len(df2)*100,2),"%")
 
-
 df2.to_csv('AWMA_input_preprocessed_MDL_withNa.csv', index=False)
 
 # df3: drop na values
@@ -253,3 +252,77 @@ df3.to_csv('AWMA_input_preprocessed_MDL_AirKorea_Meteo_2018_2020_withNa.csv', in
 
 print(df3.isna().sum()/len(df3)*100)
 
+# <2021-12-16>
+# 등간격 자료 만들기
+
+import pandas as pd
+df3 = pd.read_csv('AWMA_input_preprocessed_MDL_AirKorea_Meteo_2018_2020_withNa.csv')
+df3.date = pd.to_datetime(df3.date)
+
+# 1. 3일 간격
+dates = pd.date_range(start = '2018-01-01',end='2020-12-31', freq="D")
+
+dates = pd.DataFrame(dates)
+dates = dates.rename(columns={0:'date'})
+dates['input'] = 0
+
+dates.iloc[::3,:]['input'] = 1
+
+train = pd.DataFrame()
+test = pd.DataFrame()
+
+for i in range(len(df3)):
+    day = str(df3.iloc[i]['date'].year)+'-'+str(df3.iloc[i]['date'].month)+'-'+str(df3.iloc[i]['date'].day)
+    if dates.loc[dates.date==day]['input'].values == 1:
+        train = train.append(df3.iloc[i])
+    else:
+        test = test.append(df3.iloc[i])
+
+train.to_csv('AWMA_3days_train.csv', index=False)
+test.to_csv('AWMA_3days_test.csv', index=False)
+
+# 2. 4일 간격
+
+dates = pd.date_range(start = '2018-01-01',end='2020-12-31', freq="D")
+
+dates = pd.DataFrame(dates)
+dates = dates.rename(columns={0:'date'})
+dates['input'] = 0
+
+dates.iloc[::4,:]['input'] = 1
+
+train = pd.DataFrame()
+test = pd.DataFrame()
+
+for i in range(len(df3)):
+    day = str(df3.iloc[i]['date'].year)+'-'+str(df3.iloc[i]['date'].month)+'-'+str(df3.iloc[i]['date'].day)
+    if dates.loc[dates.date==day]['input'].values == 1:
+        train = train.append(df3.iloc[i])
+    else:
+        test = test.append(df3.iloc[i])
+
+train.to_csv('AWMA_4days_train.csv', index=False)
+test.to_csv('AWMA_4days_test.csv', index=False)
+
+# 3. 5일 간격
+
+dates = pd.date_range(start = '2018-01-01',end='2020-12-31', freq="D")
+
+dates = pd.DataFrame(dates)
+dates = dates.rename(columns={0:'date'})
+dates['input'] = 0
+
+dates.iloc[::5,:]['input'] = 1
+
+train = pd.DataFrame()
+test = pd.DataFrame()
+
+for i in range(len(df3)):
+    day = str(df3.iloc[i]['date'].year)+'-'+str(df3.iloc[i]['date'].month)+'-'+str(df3.iloc[i]['date'].day)
+    if dates.loc[dates.date==day]['input'].values == 1:
+        train = train.append(df3.iloc[i])
+    else:
+        test = test.append(df3.iloc[i])
+
+train.to_csv('AWMA_5days_train.csv', index=False)
+test.to_csv('AWMA_5days_test.csv', index=False)
