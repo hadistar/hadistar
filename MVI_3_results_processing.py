@@ -7,7 +7,6 @@ import numpy as np
 pred_dir = 'D:\\Dropbox\\패밀리룸\\MVI\\Results\\'
 
 pred_dir = "D:\\Results_2nd_final\\"
-pred_dir = 'D:\\Dropbox\\패밀리룸\\MVI\\Results\\'
 
 list = os.listdir(pred_dir)
 pred_list = []
@@ -42,8 +41,10 @@ ans_cases = ans_cases.rename(columns={1:'type', 3:'location'})
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_percentage_error
+
 def MPE(y_test, y_pred):
-    return np.mean(((y_test - y_pred) / y_test+1e-5) * 100)
+    return np.mean(((y_test - y_pred) / y_test+1e-8) * 100)
 
 ions = ['SO42-', 'NO3-', 'Cl-', 'Na+', 'NH4+', 'K+', 'Mg2+', 'Ca2+']
 ocec = ['OC', 'EC']
@@ -67,16 +68,17 @@ for i, l in enumerate(pred_list):
     results_r2 = r2_score(np.array(answer), np.array(predicted))
     results_RMSE = np.sqrt(mean_squared_error(np.array(answer), np.array(predicted)))
     results_MAE = mean_absolute_error(np.array(answer), np.array(predicted))
-    #results_MPE = MPE(np.array(answer), np.array(predicted))
+    results_MAPE = mean_absolute_percentage_error(np.array(answer), np.array(predicted))
 
     pred_cases.loc[i,'r2'] = results_r2
     pred_cases.loc[i,'RMSE'] = results_RMSE
     pred_cases.loc[i,'MAE'] = results_MAE
+    pred_cases.loc[i,'MAPE'] = results_MAPE
 
     for column in predicted.columns:
         pred_cases.loc[i, 'r2_'+column] = r2_score(np.array(answer[column]), np.array(predicted[column]))
 
-pred_cases.to_csv('results_1nd_GAIN_211201.csv', index=False)
+pred_cases.to_csv('results__211220.csv', index=False)
 
 
 
@@ -156,7 +158,7 @@ elements_name = ['ions', 'ocec','elementals','ion-ocec','ion-elementals','ocec-e
 
 for i, l in enumerate(pred_list):
 
-    if l in ['4_AP+Meteo_1_Seoul_result_777_GAIN_ions-ocec-elementals_1.csv']:
+    if l in ['4_AP+Meteo_1_Seoul_result_777_Mean_ions-ocec-elementals_1.csv']:
         print(l)
 
         case = pred_cases.iloc[i,:]
@@ -345,6 +347,4 @@ plt.legend(title="SO$_4$$^{2-}$ vs. S", loc='upper left')
 plt.tight_layout()
 plt.show()
 plt.close()
-
-
 
