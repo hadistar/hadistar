@@ -588,7 +588,7 @@ df7.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv', inde
 
 
 # 3일 간격 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
-df7 = pd.read_csv'AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
+df7 = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
 
 df8 = pd.DataFrame()
 for day in df7.date:
@@ -604,7 +604,6 @@ for day in df7.date:
     else:
 
         df8 = df8.append(temp)
-
 
 df8.loc[df8.date.dt.year == 2015] #6
 df8.loc[df8.date.dt.year == 2016] #57
