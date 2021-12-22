@@ -329,7 +329,7 @@ test.to_csv('AWMA_5days_test.csv', index=False)
 
 
 #
-### 자료 재구성 ###
+### 자료 재구성 ### 3일 간격 예측으로..
 #
 # 2017, 2018 training
 # 2019 test ?
@@ -426,8 +426,194 @@ for day in dates[0]:
     else:
         df3 = df3.append(temp)
 
-
 df4 = df3.groupby(pd.Grouper(freq='D', key='date')).mean()
 df5 = df4.dropna()
 
+
+
+# <2021-12-22>
+# Data combining
+
+
+# Input 자료에 기상, 대기오염 자료 붙이기
+
+import pandas as pd
+import numpy as np
+
+# 1. AirKorea 자료 붙이기
+
+# 1-1. 집중측정소와 가장 가까운 AirKorea Station 찾기
+
+stations = pd.read_csv("D:\\OneDrive - SNU\\data\\AirKorea\\AirKorea_20191103_전국.csv", encoding='euc-kr')
+locations = pd.read_excel('D:\\Dropbox\\패밀리룸\\MVI\\Data\\pm25speciation_locations_KoreaNational.xlsx')
+
+Nearstations = []
+
+for loc in ['Seoul']:
+    distance = []
+    temp = locations.loc[locations['location']==loc]
+
+    for i in stations.index:
+        temp_dist = (temp.lat-stations.iloc[i].Latitude)**2+(temp.lon-stations.iloc[i].Longitude)**2
+        distance.append(float(temp_dist))
+
+    Nearstations.append(stations.iloc[np.argmin(distance)]['측정소코드'])
+
+import os
+
+# 1-2. 해당 지점의 AirKorea 자료 불러오기
+
+AirKorea_2015_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2015')
+AirKorea_2016_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2016')
+AirKorea_2017_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2017')
+AirKorea_2018_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2018')
+AirKorea_2019_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2019')
+AirKorea_2020_list = os.listdir('D:\\OneDrive - SNU\\data\\AirKorea\\2020')
+
+AirKorea_2015 = pd.DataFrame()
+AirKorea_2016 = pd.DataFrame()
+AirKorea_2017 = pd.DataFrame()
+AirKorea_2018 = pd.DataFrame()
+AirKorea_2019 = pd.DataFrame()
+AirKorea_2020 = pd.DataFrame()
+
+Seoul = pd.DataFrame()
+
+for i in range(len(AirKorea_2015_list)):
+    temp = pd.read_csv('D:\\OneDrive - SNU\\data\\AirKorea\\2015\\'+AirKorea_2015_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2016_list)):
+    temp = pd.read_csv('D:\\OneDrive - SNU\\data\\AirKorea\\2016\\'+AirKorea_2016_list[i], encoding='euc-kr')
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2017_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2017\\'+AirKorea_2017_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2018_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2018\\'+AirKorea_2018_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2019_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2019\\'+AirKorea_2019_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+for i in range(len(AirKorea_2020_list)):
+    temp = pd.read_excel('D:\\OneDrive - SNU\\data\\AirKorea\\2020\\'+AirKorea_2020_list[i])
+    Seoul = Seoul.append(temp.loc[temp['측정소코드'] == Nearstations[0]])  # 서울
+
+
+# 1-3. 시간 형식 통일시키기
+# 시간 기준으로 합치기 위해 시간 형식으로 자료 변환
+
+Seoul['temp'] = Seoul['측정일시'] - 1
+Seoul['date'] = pd.to_datetime(Seoul['temp'], format='%Y%m%d%H')
+Seoul['date'] = Seoul['date'] + pd.DateOffset(hours=1)
+
+# 1-4. 쓸 자료만 추리기
+Seoul = Seoul[['date','PM25','PM10','SO2','CO','O3','NO2']]
+
+
+# 일평균으로 바꾸기
+
+# Missing이 25% 초과인 자료는 제외하고 일평균 구하기, 한 columns이라도 25% 초과시 모두 삭제
+
+Seoul_day = pd.DataFrame()
+
+for day in dates[0]:
+    temp = Seoul.loc[(day.year == Seoul.date.dt.year) & (day.month == Seoul.date.dt.month) & (day.day == Seoul.date.dt.day)]
+    if temp.isna().sum().max() > 6:
+        pass
+    else:
+        Seoul_day = Seoul_day.append(temp)
+
+Seoul_day = Seoul_day.groupby(pd.Grouper(freq='D', key='date')).mean()
+
+
+# 1-5. 기존 자료와 합치기
+# 합치기
+df6 = pd.merge(df4, Seoul_day, how='inner',on='date')
+
+# 2. 기상자료 붙이기
+
+# 2-1. 기상자료 불러오기, 서울 AWOS 지점코드 108
+Meteo_Seoul_2015 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2015_2015_2018.csv", encoding='euc-kr')
+Meteo_Seoul_2016 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2016_2016_2017.csv", encoding='euc-kr')
+Meteo_Seoul_2017 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2017_2017_2018.csv", encoding='euc-kr')
+Meteo_Seoul_2018 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2018_2018_2019.csv", encoding='euc-kr')
+Meteo_Seoul_2019 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2019_2019_2020.csv", encoding='euc-kr')
+Meteo_Seoul_2020 = pd.read_csv("D:\\OneDrive - SNU\\data\\Meteorological\\Seoul_AWOS_hour\\SURFACE_ASOS_108_HR_2020_2020_2021.csv", encoding='euc-kr')
+
+Meteo_Seoul = Meteo_Seoul_2015.append(Meteo_Seoul_2016.append(Meteo_Seoul_2017.append(Meteo_Seoul_2018.append(Meteo_Seoul_2019).append(Meteo_Seoul_2020))))
+
+
+Meteo_Seoul = Meteo_Seoul.loc[:,['일시', '기온(°C)', '강수량(mm)', '풍속(m/s)', '풍향(16방위)', '습도(%)', '증기압(hPa)',
+                                 '이슬점온도(°C)', '현지기압(hPa)', '일조(hr)', '일사(MJ/m2)', '적설(cm)',
+                                 '전운량(10분위)', '시정(10m)', '지면온도(°C)', '30cm 지중온도(°C)']]
+Meteo_Seoul.columns = ['date','temp','rainfall','ws','wd','RH','vapor',
+                       'dewpoint','pressure','sunshine','insolation','snow',
+                       'cloud','visibility','groundtemp','30cmtemp']
+Meteo_Seoul.isna().sum()
+Meteo_Seoul[['rainfall','sunshine','insolation','snow']] = Meteo_Seoul[['rainfall','sunshine','insolation','snow']].fillna(0)
+Meteo_Seoul.isna().sum()
+
+# 불필요한 변수 삭제
+del Meteo_Seoul_2018, Meteo_Seoul_2019, Meteo_Seoul_2020
+
+# 시간 기준으로 합치기 위해 시간 형식으로 자료 변환
+Meteo_Seoul.date = pd.to_datetime(Meteo_Seoul.date)
+
+
+# 일평균으로 바꾸기
+
+# Missing이 25% 초과인 자료는 제외하고 일평균 구하기, 한 columns이라도 25% 초과시 모두 삭제
+
+Meteo_Seoul_day = pd.DataFrame()
+
+for day in dates[0]:
+    temp = Meteo_Seoul.loc[(day.year == Meteo_Seoul.date.dt.year) & (day.month == Meteo_Seoul.date.dt.month) & (day.day == Meteo_Seoul.date.dt.day)]
+    if temp.isna().sum().max() > 6:
+        pass
+    else:
+        Meteo_Seoul_day = Meteo_Seoul_day.append(temp)
+
+Meteo_Seoul_day = Meteo_Seoul_day.groupby(pd.Grouper(freq='D', key='date')).mean()
+
+# 합치기
+
+df7 = pd.merge(df6, Meteo_Seoul, how='inner',on='date')
+
+df7.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv', index=False)
+
+
 # 3일 간격 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
+df7 = pd.read_csv'AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
+
+df8 = pd.DataFrame()
+for day in df7.date:
+
+    target_day1 = day +  pd.Timedelta(days=3)
+    target_day2 = day + pd.Timedelta(days=6)
+    temp = df7.loc[(day.year == df7.date.dt.year) & (day.month == df7.date.dt.month) & (day.day == df7.date.dt.day)]
+    temp = temp.append(df7.loc[(target_day1.year == df7.date.dt.year) & (target_day1.month == df7.date.dt.month) & (target_day1.day == df7.date.dt.day)])
+    temp = temp.append(df7.loc[(target_day2.year == df7.date.dt.year) & (target_day2.month == df7.date.dt.month) & (target_day2.day == df7.date.dt.day)])
+
+    if temp.isna().sum().sum() != 0:
+        pass
+    else:
+
+        df8 = df8.append(temp)
+
+
+df8.loc[df8.date.dt.year == 2015] #6
+df8.loc[df8.date.dt.year == 2016] #57
+df8.loc[df8.date.dt.year == 2017] #52
+df8.loc[df8.date.dt.year == 2018] #99
+df8.loc[df8.date.dt.year == 2019] #125
+df8.loc[df8.date.dt.year == 2020] #144
+
+df8=df8.reset_index(drop=True)
+
+train =df8.iloc[18:642]
+test = df8.iloc[639:1014]
