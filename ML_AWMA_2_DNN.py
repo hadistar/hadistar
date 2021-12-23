@@ -124,7 +124,7 @@ for ele in Missing_Col:
 
         tuner = kt.Hyperband(model_builder,
                              objective='val_accuracy',
-                             max_epochs=100,
+                             max_epochs=200,
                              factor=3,
                              directory='D:/kerastuner',
                              project_name='D:/kerastuner/' + name)
@@ -191,9 +191,6 @@ for ele in Missing_Col:
         # R2 = {evaluation[1]}.
         # """)
         # f.close()
-
-        y_predicted_total = model.predict(np.array(data_wodate_scaled.drop(columns=col_dic[ele])))
-        y_predicted_total = pd.DataFrame(y_predicted_total, columns=col_dic[ele])
 
         # rescaling
         # x = x' * (max-min) + min
