@@ -582,13 +582,14 @@ Meteo_Seoul_day = Meteo_Seoul_day.groupby(pd.Grouper(freq='D', key='date')).mean
 
 # 합치기
 
-df7 = pd.merge(df6, Meteo_Seoul, how='inner',on='date')
+df7 = pd.merge(df6, Meteo_Seoul_day, how='inner',on='date')
 
 df7.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv', index=False)
 
 
 # 3일 간격 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
 df7 = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
+df7.date = pd.to_datetime(df7.date)
 
 df8 = pd.DataFrame()
 for day in df7.date:
@@ -602,7 +603,6 @@ for day in df7.date:
     if temp.isna().sum().sum() != 0:
         pass
     else:
-
         df8 = df8.append(temp)
 
 df8.loc[df8.date.dt.year == 2015] #6
@@ -614,5 +614,7 @@ df8.loc[df8.date.dt.year == 2020] #144
 
 df8=df8.reset_index(drop=True)
 
-train =df8.iloc[18:642]
-test = df8.iloc[639:1014]
+df8['month'] = df8.date.dt.month
+df8['weekday'] = df8.date.dt.weekday +1
+
+df8.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time.csv', index=False)
