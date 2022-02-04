@@ -354,7 +354,7 @@ df = df[:-1]
 
 # MDL 이하값 MDLs*2로 대체..
 
-# Ions & carbons
+# Ions & carbons & elementals
 df = df.reset_index(drop=True).copy()
 
 MDLs = pd.read_excel('data\\Intensiv_Seoul_MDLs_2018-19.xlsx')
@@ -400,7 +400,10 @@ def calcul_mdls(row):
 
     return temp
 
+# df = df[:-1]
+
 df2 = df.apply(calcul_mdls, axis=1)
+(df2.median()*1000).to_clipboard()
 
 ## 이상하게 붙은 초 단위 시간 지우기
 df2['date'] = df2['date'] - pd.to_timedelta(df2['date'].dt.second, unit='s')
@@ -587,7 +590,8 @@ df7 = pd.merge(df6, Meteo_Seoul_day, how='inner',on='date')
 df7.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv', index=False)
 
 
-# 3일 간격 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
+# Case 1: 3일 간격 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test -> 예측 정확도 낮음!
+
 df7 = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
 df7.date = pd.to_datetime(df7.date)
 
@@ -617,4 +621,103 @@ df8=df8.reset_index(drop=True)
 df8['month'] = df8.date.dt.month
 df8['weekday'] = df8.date.dt.weekday +1
 
-df8.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time.csv', index=False)
+df7['month'] = df7.date.dt.month
+df7['weekday'] = df7.date.dt.weekday +1
+
+df8.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case1.csv', index=False)
+
+
+
+
+# Case 2: 3일 연속 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
+df7 = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
+df7.date = pd.to_datetime(df7.date)
+
+df8 = pd.DataFrame()
+for day in df7.date:
+
+    target_day1 = day +  pd.Timedelta(days=1)
+    target_day2 = day + pd.Timedelta(days=2)
+    temp = df7.loc[(day.year == df7.date.dt.year) & (day.month == df7.date.dt.month) & (day.day == df7.date.dt.day)]
+    temp = temp.append(df7.loc[(target_day1.year == df7.date.dt.year) & (target_day1.month == df7.date.dt.month) & (target_day1.day == df7.date.dt.day)])
+    temp = temp.append(df7.loc[(target_day2.year == df7.date.dt.year) & (target_day2.month == df7.date.dt.month) & (target_day2.day == df7.date.dt.day)])
+
+    if temp.isna().sum().sum() != 0:
+        pass
+    else:
+        df8 = df8.append(temp)
+
+df8.loc[df8.date.dt.year == 2015] #5
+df8.loc[df8.date.dt.year == 2016] #84
+df8.loc[df8.date.dt.year == 2017] #72
+df8.loc[df8.date.dt.year == 2018] #137
+df8.loc[df8.date.dt.year == 2019] #171
+df8.loc[df8.date.dt.year == 2020] #193
+
+df8=df8.reset_index(drop=True)
+
+df8['month'] = df8.date.dt.month
+df8['weekday'] = df8.date.dt.weekday +1
+
+df8.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case2.csv', index=False)
+
+
+
+# Case 3: 2일 연속 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
+df7 = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
+df7.date = pd.to_datetime(df7.date)
+
+df8 = pd.DataFrame()
+for day in df7.date:
+
+    target_day1 = day +  pd.Timedelta(days=1)
+    temp = df7.loc[(day.year == df7.date.dt.year) & (day.month == df7.date.dt.month) & (day.day == df7.date.dt.day)]
+    temp = temp.append(df7.loc[(target_day1.year == df7.date.dt.year) & (target_day1.month == df7.date.dt.month) & (target_day1.day == df7.date.dt.day)])
+
+    if temp.isna().sum().sum() != 0:
+        pass
+    else:
+        df8 = df8.append(temp)
+
+df8=df8.reset_index(drop=True)
+
+df8['month'] = df8.date.dt.month
+df8['weekday'] = df8.date.dt.weekday +1
+
+df8.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case3.csv', index=False)
+
+
+# Case 4: 1일 연속 자료로 입력자료 구성하기, 2017, 2018 training, 2019 test
+df7 = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea.csv')
+df7.date = pd.to_datetime(df7.date)
+
+df8 = df7.dropna()
+
+df8=df8.reset_index(drop=True)
+
+df8['month'] = df8.date.dt.month
+df8['weekday'] = df8.date.dt.weekday +1
+
+df8.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case4.csv', index=False)
+
+
+
+## 2021-12-29, 서울 광공업생산지수 추가해서 Case 6 만들기
+
+df = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case4.csv')
+df=df.drop(columns=['PM25', 'groundtemp', '30cmtemp','dewpoint','wd','sunshine','insolation'])
+df.date = pd.to_datetime(df.date)
+
+df2 = pd.read_excel('d:\\Dropbox\\Shared_Air_ML\\ref.data\\시도_광공업생산지수_월별_2015-2020.xlsx', sheet_name='데이터')
+df2.date = pd.to_datetime(df2.date)
+
+df6 = pd.DataFrame()
+
+for day in df.date:
+
+    temp = df.loc[df.date==day]
+    temp2 = df2.loc[(day.year == df2.date.dt.year) & (day.month == df2.date.dt.month)]['서울특별시'].values
+    temp['production_index'] = temp2
+    df6 = df6.append(temp)
+
+df6.to_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case6.csv', index=False)

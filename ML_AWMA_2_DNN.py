@@ -8,8 +8,8 @@ import shutil
 from keras.layers import LeakyReLU
 LeakyReLU = LeakyReLU(alpha=0.1)
 
-
-df = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time.csv')
+df = pd.read_csv('AWMA_input_preprocessed_MDL_2015_2020_PM25_Meteo_AirKorea_time_case6.csv')
+#df=df.drop(columns=['PM25', 'groundtemp', '30cmtemp','dewpoint', 'wd','sunshine','insolation'])
 
 # Scaling
 scalingfactor = {}
@@ -22,8 +22,29 @@ for c in df.columns[1:]:
 
 data_wodate_scaled = data_scaled.iloc[:, 1:]
 
-train =data_wodate_scaled.iloc[18:645]
-test = data_wodate_scaled.iloc[645:1023]
+# # For case 1
+# train =data_wodate_scaled.iloc[:645]
+# test = data_wodate_scaled.iloc[645:1023]
+#
+# # For case 2
+#
+# train =data_wodate_scaled.iloc[:903]
+# test = data_wodate_scaled.iloc[903:1416]
+
+#
+# # For case 3
+#
+# train =data_wodate_scaled.iloc[:786]
+# test = data_wodate_scaled.iloc[786:1194]
+#
+#
+# # For case 4
+# data_wodate_scaled =data_wodate_scaled.iloc[:759]
+
+
+# For case 7
+
+data_wodate_scaled =data_wodate_scaled.iloc[:1194]
 
 ions = ['SO42-', 'NO3-', 'Cl-', 'Na+', 'NH4+', 'K+', 'Mg2+', 'Ca2+']
 ocec = ['OC', 'EC']
@@ -31,54 +52,197 @@ elementals = ['S', 'K', 'Ca', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Ni', 'Cu', 'Zn', 'As
 
 col_dic = {'ocec': ocec, 'elementals': elementals, 'ions': ions, 'ocec-elementals': ocec+elementals,
            'ions-ocec': ions+ocec, 'ions-elementals': ions+elementals, 'ions-ocec-elementals': ions+ocec+elementals}
+
 Missing_Col = ['ions','ocec', 'elementals', 'ocec-elementals', 'ions-ocec', 'ions-elementals', 'ions-ocec-elementals']
 
+#Missing_Col = ['elementals']
 
-iteration = 2
+iteration = 3
 
 # DNN 모델
 
 
-case = '3day_DNN'
+case = 'DNN_case7_'
 
 for ele in Missing_Col:
     for iter in range(iteration):
 
-        name = 'result_' + case + '_2019predicttion_' + str(ele) + '_iter_' + str(iter + 1)
+        name = 'AWMA_result_' + case + str(ele) + '_iter_' + str(iter + 1)
+        #
+        # # train x,y 만들기 for case 1
+        #
+        # temp = np.array(train[col_dic[ele]])
+        #
+        # train_x = []
+        # train_y = []
+        # for i in range(0,len(train),3):
+        #     temp = np.array(train)[i] # i번째 행의 모든 자료로 temp 변수 생성
+        #     temp = np.append(temp, np.array(train.drop(col_dic[ele], axis=1))[i+1]) # i+1번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     temp = np.append(temp, np.array(train)[i+2]) # i+2번째 행의 모든 자료 추가
+        #
+        #     train_x.append(temp)
+        #
+        #     train_y.append(np.array(train[col_dic[ele]])[i+1])
+        #
+        # train_x = np.array(train_x)
+        # train_y = np.array(train_y)
+        #
+        # # test x, y 만들기 for case 1
+        #
+        # test_x = []
+        # test_y = []
+        # for i in range(0, len(test), 3):
+        #     temp = np.array(test)[i]  # i번째 행의 모든 자료로 temp 변수 생성
+        #     temp = np.append(temp, np.array(test.drop(col_dic[ele], axis=1))[i + 1])  # i+1번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     temp = np.append(temp, np.array(test)[i + 2])  # i+2번째 행의 모든 자료 추가
+        #
+        #     test_x.append(temp)
+        #
+        #     test_y.append(np.array(test[col_dic[ele]])[i + 1])
+        #
+        # test_x = np.array(test_x)
+        # test_y = np.array(test_y)
+        #
+        #
+        # # train x,y 만들기 for case 2
+        #
+        # temp = np.array(train[col_dic[ele]])
+        #
+        # train_x = []
+        # train_y = []
+        # for i in range(0,len(train),3):
+        #     temp = np.array(train)[i+1] # i+1번째 행의 모든 자료로 temp 변수 생성
+        #     temp = np.append(temp, np.array(train.drop(col_dic[ele], axis=1))[i]) # i번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     temp = np.append(temp, np.array(train.drop(col_dic[ele], axis=1))[i+2]) # i+2번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     train_x.append(temp)
+        #
+        #     temp = np.array(train[col_dic[ele]])[i] # i번째의 행 예측 target 추가
+        #     temp = np.append(temp, np.array(train[col_dic[ele]])[i+2]) # i+2번째의 행 예측 target 추가
+        #     train_y.append(temp)
+        #
+        # train_x = np.array(train_x)
+        # train_y = np.array(train_y)
+        #
+        # # test x, y 만들기 for case 2
+        #
+        # test_x = []
+        # test_y = []
+        # for i in range(0, len(test), 3):
+        #     temp = np.array(test)[i + 1]  # i+1번째 행의 모든 자료로 temp 변수 생성
+        #     temp = np.append(temp, np.array(test.drop(col_dic[ele], axis=1))[i])  # i번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     temp = np.append(temp,
+        #                      np.array(test.drop(col_dic[ele], axis=1))[i + 2])  # i+2번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     test_x.append(temp)
+        #
+        #     temp = np.array(test[col_dic[ele]])[i]  # i번째의 행 예측 target 추가
+        #     temp = np.append(temp, np.array(test[col_dic[ele]])[i + 2])  # i+2번째의 행 예측 target 추가
+        #     test_y.append(temp)
+        #
+        # test_x = np.array(test_x)
+        # test_y = np.array(test_y)
 
-        # train x,y 만들기
 
-        temp = np.array(train[col_dic[ele]])
+        # # train x,y 만들기 for case 3
+        #
+        # temp = np.array(train[col_dic[ele]])
+        #
+        # train_x = []
+        # train_y = []
+        # for i in range(0,len(train),2):
+        #     temp = np.array(train)[i] # i번째 행의 모든 자료로 temp 변수 생성
+        #     temp = np.append(temp, np.array(train.drop(col_dic[ele], axis=1))[i+1]) # i+1번째 행의 자료 추가, 예측 target은 빼고 추가
+        #
+        #     train_x.append(temp)
+        #
+        #     temp = np.array(train[col_dic[ele]])[i+1] # i+1번째의 행 예측 target 추가
+        #     train_y.append(temp)
+        #
+        # train_x = np.array(train_x)
+        # train_y = np.array(train_y)
+        #
+        # # test x, y 만들기 for case 3
+        #
+        # test_x = []
+        # test_y = []
+        # for i in range(0, len(test), 2):
+        #     temp = np.array(test)[i]  # i번째 행의 모든 자료로 temp 변수 생성
+        #     temp = np.append(temp, np.array(test.drop(col_dic[ele], axis=1))[i+1])  # i+1번째 행의 자료 추가, 예측 target은 빼고 추가
+        #     test_x.append(temp)
+        #
+        #     temp = np.array(test[col_dic[ele]])[i+1]  # i+1번째의 행 예측 target 추가
+        #     test_y.append(temp)
+        #
+        # test_x = np.array(test_x)
+        # test_y = np.array(test_y)
 
-        train_x = []
-        train_y = []
-        for i in range(0,len(train),3):
-            temp = np.array(train)[i] # i번째 행의 모든 자료로 temp 변수 생성
-            temp = np.append(temp, np.array(train.drop(col_dic[ele], axis=1))[i+1]) # i+1번째 행의 자료 추가, 예측 target은 빼고 추가
-            temp = np.append(temp, np.array(train)[i+2]) # i+2번째 행의 모든 자료 추가
 
-            train_x.append(temp)
+        #
+        # # train x,y, test x, y 만들기 for case 4
+        #
+        #
+        # eraser = np.random.randint(0, 759, size=int(759*0.2))
+        #
+        # train_x = np.array(data_wodate_scaled.drop(index=data_wodate_scaled.index[eraser], columns=col_dic[ele]))
+        # train_y = data_wodate_scaled.drop(index=data_wodate_scaled.index[eraser]).loc[:, col_dic[ele]]
+        # train_y = np.array(train_y)
+        #
+        # test_x = np.array(data_wodate_scaled.loc[eraser].drop(columns=col_dic[ele]))
+        # test_y = np.array(data_wodate_scaled.loc[eraser, col_dic[ele]])
+        #
 
-            train_y.append(np.array(train[col_dic[ele]])[i+1])
 
-        train_x = np.array(train_x)
-        train_y = np.array(train_y)
+        # # train x,y, test x, y 만들기 for case 5
+        #
+        #
+        # eraser = np.random.randint(0, 759, size=int(759*0.2))
+        #
+        # train_x = np.array(data_wodate_scaled.drop(index=data_wodate_scaled.index[eraser], columns=col_dic[ele]))
+        # train_y = data_wodate_scaled.drop(index=data_wodate_scaled.index[eraser]).loc[:, col_dic[ele]]
+        # train_y = np.array(train_y)
+        #
+        # test_x = np.array(data_wodate_scaled.loc[eraser].drop(columns=col_dic[ele]))
+        # test_y = np.array(data_wodate_scaled.loc[eraser, col_dic[ele]])
 
-        # test x, y 만들기
+
+        # # train x,y, test x, y 만들기 for case 6
+        #
+        # eraser = np.random.randint(0, 759, size=int(759 * 0.2))
+        #
+        # train_x = np.array(data_wodate_scaled.drop(index=data_wodate_scaled.index[eraser], columns=col_dic[ele]))
+        # train_y = data_wodate_scaled.drop(index=data_wodate_scaled.index[eraser]).loc[:, col_dic[ele]]
+        # train_y = np.array(train_y)
+        #
+        # test_x = np.array(data_wodate_scaled.loc[eraser].drop(columns=col_dic[ele]))
+        # test_y = np.array(data_wodate_scaled.loc[eraser, col_dic[ele]])
+        #
+
+
+        # train x,y, test x, y 만들기 for case 7
+
+        eraser = np.random.choice(int(1194/2), int(1194/2 * 0.2), replace=False)*2
+        count=0
 
         test_x = []
         test_y = []
-        for i in range(0, len(test), 3):
-            temp = np.array(test)[i]  # i번째 행의 모든 자료로 temp 변수 생성
-            temp = np.append(temp, np.array(test.drop(col_dic[ele], axis=1))[i + 1])  # i+1번째 행의 자료 추가, 예측 target은 빼고 추가
-            temp = np.append(temp, np.array(test)[i + 2])  # i+2번째 행의 모든 자료 추가
+        train_x = []
+        train_y = []
 
-            test_x.append(temp)
-
-            test_y.append(np.array(test[col_dic[ele]])[i + 1])
+        for i in range(0,len(data_wodate_scaled),2):
+            if i in eraser:
+                temp_test_x = data_wodate_scaled.iloc[i]
+                temp = data_wodate_scaled.iloc[i+1]
+                test_x.append(temp_test_x.append(temp.drop(col_dic[ele])))
+                test_y.append(temp[col_dic[ele]])
+            else:
+                temp_train_x = data_wodate_scaled.iloc[i]
+                temp = data_wodate_scaled.iloc[i+1]
+                train_x.append(temp_train_x.append(temp.drop(col_dic[ele])))
+                train_y.append(temp[col_dic[ele]])
 
         test_x = np.array(test_x)
         test_y = np.array(test_y)
+        train_x = np.array(train_x)
+        train_y = np.array(train_y)
 
 
         def model_builder(hp):
@@ -87,7 +251,7 @@ for ele in Missing_Col:
             # Tune the number of units in the first Dense layer
             # Choose an optimal value between 32-512
 
-            for i in range(hp.Int('num_layers', 2, 9)):
+            for i in range(hp.Int('num_layers', 2, 7)):
                 model.add(keras.layers.Dense(units=hp.Int('units',
                                                           min_value=32,
                                                           max_value=2048,
@@ -125,7 +289,7 @@ for ele in Missing_Col:
         tuner = kt.Hyperband(model_builder,
                              objective='val_accuracy',
                              max_epochs=200,
-                             factor=3,
+                             factor=2,
                              directory='D:/kerastuner',
                              project_name='D:/kerastuner/' + name)
 
@@ -167,7 +331,8 @@ for ele in Missing_Col:
         The optimal number of units: {best_hps.get('units')}
         The optimal learning rate: {best_hps.get('learning_rate')}.
         The optimal dropout rate: {best_hps.get('dropout_rate')}.
-        R2 = {evaluation[1]}.
+        training r2 = {model.evaluate(train_x, train_y)[1]}
+        test R2 = {evaluation[1]}
         """)
 
         f = open(name + '.txt', 'w')
@@ -177,29 +342,58 @@ for ele in Missing_Col:
         The optimal number of units: {best_hps.get('units')}
         The optimal learning rate: {best_hps.get('learning_rate')}.
         The optimal dropout rate: {best_hps.get('dropout_rate')}.
-        R2 = {evaluation[1]}.
+        training r2 = {model.evaluate(train_x, train_y)[1]}
+        test R2 = {evaluation[1]}
         """)
         f.close()
 
-        # f.write(f"""
-        # The hyperparameter search is complete.
-        # The optimal number of layers: {best_hps.get('num_layers')}
-        # The optimal number of units: {best_hps.get('units')}
-        # The optimal learning rate: {best_hps.get('learning_rate')}.
-        # The optimal dropout rate: {best_hps.get('dropout_rate')}.
-        # The optimal activation function: {best_hps.get('activation_function')}.
-        # R2 = {evaluation[1]}.
-        # """)
-        # f.close()
+        # For case 1,...
+
+        y_predicted_pd = pd.DataFrame(y_predicted, columns=col_dic[ele])
+        y_predicted_answer = pd.DataFrame(test_y, columns=col_dic[ele])
+
+
+        # # For case 2 only
+        # y_predicted_pd1 = pd.DataFrame(y_predicted[:,:len(col_dic[ele])], columns=col_dic[ele])
+        # y_predicted_pd2 = pd.DataFrame(y_predicted[:, len(col_dic[ele]):], columns=col_dic[ele])
+        # y_predicted_answer1 = pd.DataFrame(test_y[:,:len(col_dic[ele])], columns=col_dic[ele])
+        # y_predicted_answer2 = pd.DataFrame(test_y[:,len(col_dic[ele]):], columns=col_dic[ele])
+        #
+
 
         # rescaling
         # x = x' * (max-min) + min
         # saving scaling factor in [max-min, min, max]
 
-        for c in y_predicted_total:
-            y_predicted_total[c] = y_predicted_total[c] * scalingfactor[c][0] + scalingfactor[c][1]
+        # For case 1,...
 
-        y_predicted_total.to_csv(name + '.csv', index=False)
+        for c in y_predicted_pd:
+            y_predicted_pd[c] = y_predicted_pd[c] * scalingfactor[c][0] + scalingfactor[c][1]
+            y_predicted_answer[c] = y_predicted_answer[c] * scalingfactor[c][0] + scalingfactor[c][1]
+
+        writer = pd.ExcelWriter(name+'.xlsx', engine='xlsxwriter')
+        y_predicted_pd.to_excel(writer, sheet_name='predicted')
+        y_predicted_answer.to_excel(writer, sheet_name='answer')
+        writer.save()
+        writer.close
+
+        # # For case 2 only
+        #
+        # for c in y_predicted_pd1:
+        #     y_predicted_pd1[c] = y_predicted_pd1[c] * scalingfactor[c][0] + scalingfactor[c][1]
+        #     y_predicted_answer1[c] = y_predicted_answer1[c] * scalingfactor[c][0] + scalingfactor[c][1]
+        # for c in y_predicted_pd2:
+        #     y_predicted_pd2[c] = y_predicted_pd2[c] * scalingfactor[c][0] + scalingfactor[c][1]
+        #     y_predicted_answer2[c] = y_predicted_answer2[c] * scalingfactor[c][0] + scalingfactor[c][1]
+        #
+        # y_predicted_pd = pd.concat([y_predicted_pd1, y_predicted_pd2], axis=1)
+        # y_predicted_answer = pd.concat([y_predicted_answer1,y_predicted_answer2], axis=1)
+        #
+        # writer = pd.ExcelWriter(name+'.xlsx', engine='xlsxwriter')
+        # y_predicted_pd.to_excel(writer, sheet_name='predicted')
+        # y_predicted_answer.to_excel(writer, sheet_name='answer')
+        # writer.save()
+        # writer.close
 
         del model
         del history

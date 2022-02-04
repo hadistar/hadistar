@@ -11,6 +11,7 @@ df.to_csv('1_Basic_Seoul_raw.csv', index=False)
 round(df.isnull().sum()/len(df)*100, 2).to_clipboard()
 (df.dropna().mean()*1000).to_clipboard()
 
+df.drop(columns=['date','PM2.5']).isnull().sum().mean()/len(df)*100
 
 df.sample(int(len(df)*0.2), random_state=777)
 

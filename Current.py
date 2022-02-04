@@ -364,3 +364,26 @@ final = ans[['spot_cd', 'spot_lat', 'spot_lon', 'date', '해염 입자', '석탄
 final.to_csv('스마트시티_매핑결과_서울대_raw_좌표재설정_211215.csv', index=False, encoding='euc-kr')
 
 
+
+# 2022-01-07, heatmap, BNFA vs. PMF
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+
+dir = 'D:\\OneDrive - SNU\\바탕 화면\\ing\\Manuscript_BSMRM\\Analysis\\220107_comparison_BNFA_PMF_daejeon\\'
+
+df1 = pd.read_csv(dir+'BNFA_Daejeon_q6.csv')
+df2 = pd.read_csv(dir+'PMF_Daejeon_q6.csv')
+
+df1 = df1.add_prefix('BNFA_')
+df2 = df2.add_prefix('PMF_')
+
+df = pd.concat([df1, df2], axis=1)
+
+plt.figure(figsize=(10,10))
+corr = df.corr()
+sns.heatmap(corr, cmap='bwr', annot=True)
+plt.show()

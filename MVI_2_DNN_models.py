@@ -35,6 +35,11 @@ iteration = 2
 for case in Data_Name:
 
     df = pd.read_csv('D:\\Dropbox\\패밀리룸\\MVI\\Data\\' + case + '_raw.csv')
+    eraser = df.sample(int(len(df) * 0.2), random_state=seeds[s]).index
+
+    print(case, len(df), len(df)-len(eraser), len(eraser))
+
+
     scalingfactor = {}
     data_scaled = df.copy()
 

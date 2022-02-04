@@ -203,3 +203,33 @@ for species in predicted.columns:
     plt.close()
 
 
+
+
+# <2021-12-28> 1개월짜리 예측의 모델결과별 비교 Tukey's
+
+import pandas as pd
+import urllib
+import matplotlib.pyplot as plt
+import numpy as np
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
+
+# 1. Tukey, r2값 이용
+
+df = pd.read_excel('d:\\Dropbox\\hadistar\\results_missing-rate.xlsx', sheet_name='results_missing-rate')
+
+df2 = df.loc[df.rate==2].loc[df.period==0]
+
+group1 = df2.loc[df2.model=='GAIN']
+group2 = df2.loc[df2.model=='DNN']
+group3 = df2.loc[df2.model=='RF']
+group4 = df2.loc[df2.model=='KNN']
+
+df3 = group1[['model', 'r2']].append(group2[['model', 'r2']]).append(group3[['model', 'r2']]).append(group4[['model', 'r2']]).reset_index(drop=True)
+
+posthoc = pairwise_tukeyhsd(df3['r2'], df3['model'], alpha=0.05)
+print(posthoc)
+
+fig = posthoc.plot_simultaneous()
+
+plt.show()
+plt.close()
